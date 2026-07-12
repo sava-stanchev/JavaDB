@@ -3,9 +3,11 @@ package com.sava.javadb;
 import java.util.Scanner;
 
 public class Console {
+    private final Database db;
     private final Scanner sc;
 
-    public Console() {
+    public Console(Database db) {
+        this.db = db;
         sc = new Scanner(System.in);
     }
 
