@@ -25,35 +25,17 @@ public class Console {
 
             switch (cmd) {
                 case "PUT":
-                    if (parts.length == 3) {
-                        db.put(parts[1], parts[2]);
-                        System.out.println("OK");
-                    } else {
-                        System.out.println("Usage: PUT <key> <value>");
-                    }
-
+                    handlePut(parts);
                     break;
                 case "GET":
-                    if (parts.length == 2) {
-                        String val = db.get(parts[1]);
-                        System.out.println(val != null ? val : "Key not found.");
-                    } else {
-                        System.out.println("Usage: GET <key>");
-                    }
-
+                    handleGet(parts);
                     break;
                 case "DELETE":
-                    if (parts.length == 2) {
-                        boolean isDeleted = db.delete(parts[1]);
-                        System.out.println(isDeleted ? "OK" : "Key not found.");
-                    } else {
-                        System.out.println("Usage: DELETE <key>");
-                    }
-
+                    handleDelete(parts);
                     break;
                 case "HELP":
                     showHelp();
-                    continue;
+                    break;
                 case "EXIT":
                     System.out.println("Goodbye!");
                     return;
@@ -71,5 +53,32 @@ public class Console {
         System.out.println("DELETE <key> - Delete a key");
         System.out.println("HELP - Show available commands");
         System.out.println("EXIT - Exit JavaDB");
+    }
+
+    private void handlePut(String[] parts) {
+        if (parts.length == 3) {
+            db.put(parts[1], parts[2]);
+            System.out.println("OK");
+        } else {
+            System.out.println("Usage: PUT <key> <value>");
+        }
+    }
+
+    private void handleGet(String[] parts) {
+        if (parts.length == 2) {
+            String val = db.get(parts[1]);
+            System.out.println(val != null ? val : "Key not found.");
+        } else {
+            System.out.println("Usage: GET <key>");
+        }
+    }
+
+    private void handleDelete(String[] parts) {
+        if (parts.length == 2) {
+            boolean isDeleted = db.delete(parts[1]);
+            System.out.println(isDeleted ? "OK" : "Key not found.");
+        } else {
+            System.out.println("Usage: DELETE <key>");
+        }
     }
 }
