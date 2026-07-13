@@ -14,7 +14,7 @@ The goal is to understand how databases work internally by implementing the core
 ## Roadmap
 
 * [x] Project setup
-* [ ] In-memory key-value store
+* [x] In-memory key-value store
 * [ ] Persistent storage
 * [ ] Write-ahead logging (WAL)
 * [ ] Indexes
