@@ -1,8 +1,11 @@
 package com.sava.javadb;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 public class Console {
+    private static final Path DB_FILE = Path.of("database.db");
     private final Database db;
     private final Scanner sc;
 
@@ -33,6 +36,12 @@ public class Console {
                 case "DELETE":
                     handleDelete(parts);
                     break;
+                case "SAVE":
+                    saveDatabase();
+                    break;
+                case "LOAD":
+                    loadDatabase();
+                    break;
                 case "HELP":
                     showHelp();
                     break;
@@ -51,6 +60,8 @@ public class Console {
         System.out.println("PUT <key> <value> - Store a value");
         System.out.println("GET <key> - Retrieve a value");
         System.out.println("DELETE <key> - Delete a key");
+        System.out.println("SAVE - Save database to disk");
+        System.out.println("LOAD - Load database from disk");
         System.out.println("HELP - Show available commands");
         System.out.println("EXIT - Exit JavaDB");
     }
@@ -79,6 +90,24 @@ public class Console {
             System.out.println(isDeleted ? "OK" : "Key not found.");
         } else {
             System.out.println("Usage: DELETE <key>");
+        }
+    }
+
+    private void saveDatabase() {
+        try {
+            db.save(DB_FILE);
+            System.out.println("OK");
+        } catch (IOException e) {
+            System.out.println("Save failed: " + e.getMessage());
+        }
+    }
+
+    private void loadDatabase() {
+        try {
+            db.load(DB_FILE);
+            System.out.println("OK");
+        } catch (IOException e) {
+            System.out.println("Load failed: " + e.getMessage());
         }
     }
 }
