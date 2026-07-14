@@ -16,7 +16,7 @@ public class DatabaseTest {
 
     @BeforeEach
     void setUp() {
-        WriteAheadLog wal = new WriteAheadLog();
+        WriteAheadLog wal = new WriteAheadLog(tempDir.resolve("wal.log"));
         db = new Database(wal);
     }
 
@@ -60,7 +60,7 @@ public class DatabaseTest {
         db.put("city", "Sofia");
         Path file = tempDir.resolve("database.db");
         db.save(file);
-        Database db2 = new Database(new WriteAheadLog());
+        Database db2 = new Database(new WriteAheadLog(tempDir.resolve("wal.log")));
         db2.load(file);
         assertEquals("Sava", db2.get("name"));
         assertEquals("Sofia", db2.get("city"));
@@ -71,7 +71,7 @@ public class DatabaseTest {
         db.put("name", "Sava");
         Path file = tempDir.resolve("database.db");
         db.save(file);
-        Database db2 = new Database(new WriteAheadLog());
+        Database db2 = new Database(new WriteAheadLog(tempDir.resolve("wal.log")));
         db2.put("oldKey", "oldVal");
         db2.load(file);
         assertNull(db2.get("oldKey"));
