@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 public class Database {
+    private final WriteAheadLog wal;
     private final Map<String, String> data;
 
-    public Database() {
+    public Database(WriteAheadLog wal) {
+        this.wal = wal;
         data = new HashMap<>();
     }
 
