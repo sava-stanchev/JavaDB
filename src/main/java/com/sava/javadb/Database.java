@@ -19,6 +19,10 @@ public class Database {
 
     public void put(String key, String val) throws IOException {
         wal.append("PUT " + key + " " + val);
+        applyPut(key, val);
+    }
+
+    private void applyPut(String key, String val) {
         data.put(key, val);
     }
 
@@ -31,8 +35,11 @@ public class Database {
             return false;
 
         wal.append("DELETE " + key);
-        data.remove(key);
-        return true;
+        return applyDelete(key);
+    }
+
+    private boolean applyDelete(String key) {
+        return data.remove(key) != null;
     }
 
     public void save(Path path) throws IOException {
@@ -52,6 +59,22 @@ public class Database {
         for (String line : lines) {
             String[] parts = line.split("=");
             data.put(parts[0], parts[1]);
+        }
+    }
+
+    public void applyWalEntry(String entry) {
+        String[] parts = entry.split(" ");
+        String cmd = parts[0].toUpperCase();
+
+        switch (cmd) {
+            case "PUT":
+                applyPut(parts[1], parts[2]);
+                break;
+            case "DELETE":
+                applyDelete(parts[1]);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid WAL entry: " + entry);
         }
     }
 }
