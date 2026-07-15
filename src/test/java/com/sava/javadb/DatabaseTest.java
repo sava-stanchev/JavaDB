@@ -21,7 +21,7 @@ public class DatabaseTest {
     }
 
     @Test
-    void shouldStoreAndRetrieveVal() {
+    void shouldStoreAndRetrieveVal() throws IOException {
         db.put("name", "Sava");
         String val = db.get("name");
         assertEquals("Sava", val);
@@ -34,20 +34,20 @@ public class DatabaseTest {
     }
 
     @Test
-    void shouldDeleteExistingKey() {
+    void shouldDeleteExistingKey() throws IOException {
         db.put("name", "Sava");
         boolean isDeleted = db.delete("name");
         assertTrue(isDeleted);
     }
 
     @Test
-    void shouldReturnFalseWhenDeletingMissingKey() {
+    void shouldReturnFalseWhenDeletingMissingKey() throws IOException {
         boolean isDeleted = db.delete("age");
         assertFalse(isDeleted);
     }
 
     @Test
-    void shouldRemoveValAfterDelete() {
+    void shouldRemoveValAfterDelete() throws IOException {
         db.put("name", "Sava");
         db.delete("name");
         String val = db.get("name");
