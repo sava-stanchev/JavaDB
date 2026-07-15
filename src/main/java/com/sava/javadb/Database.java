@@ -17,7 +17,8 @@ public class Database {
         data = new HashMap<>();
     }
 
-    public void put(String key, String val) {
+    public void put(String key, String val) throws IOException {
+        wal.append("PUT " + key + " " + val);
         data.put(key, val);
     }
 
@@ -25,8 +26,13 @@ public class Database {
         return data.get(key);
     }
 
-    public boolean delete(String key) {
-        return data.remove(key) != null;
+    public boolean delete(String key) throws IOException {
+        if (!data.containsKey(key))
+            return false;
+
+        wal.append("DELETE " + key);
+        data.remove(key);
+        return true;
     }
 
     public void save(Path path) throws IOException {

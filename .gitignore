@@ -1,3 +1,6 @@
+database.db
+wal.log
+
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -41,5 +44,3 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-
-database.db

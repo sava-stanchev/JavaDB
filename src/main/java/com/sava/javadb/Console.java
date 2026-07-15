@@ -68,8 +68,12 @@ public class Console {
 
     private void handlePut(String[] parts) {
         if (parts.length == 3) {
-            db.put(parts[1], parts[2]);
-            System.out.println("OK");
+            try {
+                db.put(parts[1], parts[2]);
+                System.out.println("OK");
+            } catch (IOException e) {
+                System.out.println("PUT failed: " + e.getMessage());
+            }
         } else {
             System.out.println("Usage: PUT <key> <value>");
         }
@@ -86,8 +90,12 @@ public class Console {
 
     private void handleDelete(String[] parts) {
         if (parts.length == 2) {
-            boolean isDeleted = db.delete(parts[1]);
-            System.out.println(isDeleted ? "OK" : "Key not found.");
+            try {
+                boolean isDeleted = db.delete(parts[1]);
+                System.out.println(isDeleted ? "OK" : "Key not found.");
+            } catch (IOException e) {
+                System.out.println("DELETE failed: " + e.getMessage());
+            }
         } else {
             System.out.println("Usage: DELETE <key>");
         }
