@@ -1,11 +1,9 @@
 package com.sava.javadb;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Scanner;
 
 public class Console {
-    private static final Path DB_FILE = Path.of("database.db");
     private final Database db;
     private final Scanner sc;
 
@@ -37,10 +35,13 @@ public class Console {
                     handleDelete(parts);
                     break;
                 case "SAVE":
-                    saveDatabase();
+                    saveDb();
                     break;
                 case "LOAD":
-                    loadDatabase();
+                    loadDb();
+                    break;
+                case "CHECKPOINT":
+                    checkpointDb();
                     break;
                 case "HELP":
                     showHelp();
@@ -62,6 +63,7 @@ public class Console {
         System.out.println("DELETE <key> - Delete a key");
         System.out.println("SAVE - Save database to disk");
         System.out.println("LOAD - Load database from disk");
+        System.out.println("CHECKPOINT - Save snapshot and clear WAL");
         System.out.println("HELP - Show available commands");
         System.out.println("EXIT - Exit JavaDB");
     }
@@ -101,21 +103,30 @@ public class Console {
         }
     }
 
-    private void saveDatabase() {
+    private void saveDb() {
         try {
-            db.save(DB_FILE);
+            db.save();
             System.out.println("OK");
         } catch (IOException e) {
             System.out.println("Save failed: " + e.getMessage());
         }
     }
 
-    private void loadDatabase() {
+    private void loadDb() {
         try {
-            db.load(DB_FILE);
+            db.load();
             System.out.println("OK");
         } catch (IOException e) {
             System.out.println("Load failed: " + e.getMessage());
+        }
+    }
+
+    private void checkpointDb() {
+        try {
+            db.checkpoint();
+            System.out.println("OK");
+        } catch (IOException e) {
+            System.out.println("Checkpoint failed: " + e.getMessage());
         }
     }
 }

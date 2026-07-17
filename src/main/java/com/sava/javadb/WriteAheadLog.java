@@ -29,4 +29,8 @@ public class WriteAheadLog {
 
         return Files.readAllLines(path);
     }
+
+    public void clear() throws IOException {
+        Files.deleteIfExists(path);
+    }
 }

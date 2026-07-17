@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Database {
+    private static final Path DB_FILE = Path.of("database.db");
     private final WriteAheadLog wal;
     private final Map<String, String> data;
 
@@ -42,6 +43,10 @@ public class Database {
         return data.remove(key) != null;
     }
 
+    public void save() throws IOException {
+        save(DB_FILE);
+    }
+
     public void save(Path path) throws IOException {
         List<String> lines = new ArrayList<>();
 
@@ -52,8 +57,14 @@ public class Database {
         Files.write(path, lines);
     }
 
+    public void load() throws IOException {
+        load(DB_FILE);
+    }
+
     public void load(Path path) throws IOException {
         data.clear();
+        if (!Files.exists(path))
+            return;
         List<String> lines = Files.readAllLines(path);
 
         for (String line : lines) {
@@ -76,5 +87,10 @@ public class Database {
             default:
                 throw new IllegalArgumentException("Invalid WAL entry: " + entry);
         }
+    }
+
+    public void checkpoint() throws IOException {
+        save(DB_FILE);
+        wal.clear();
     }
 }

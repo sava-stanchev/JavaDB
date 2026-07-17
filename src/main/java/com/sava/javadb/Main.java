@@ -7,6 +7,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         WriteAheadLog wal = new WriteAheadLog(Path.of("wal.log"));
         Database db = new Database(wal);
+        db.load();
 
         for (String entry : wal.readEntries()) {
             db.applyWalEntry(entry);
