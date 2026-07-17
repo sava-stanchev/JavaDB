@@ -11,11 +11,11 @@ import java.util.Map;
 public class Database {
     private static final Path DB_FILE = Path.of("database.db");
     private final WriteAheadLog wal;
-    private final Map<String, String> data;
+    private final HashTable<String, String> data;
 
     public Database(WriteAheadLog wal) {
         this.wal = wal;
-        data = new HashMap<>();
+        data = new HashTable<>();
     }
 
     public void put(String key, String val) throws IOException {
@@ -32,7 +32,7 @@ public class Database {
     }
 
     public boolean delete(String key) throws IOException {
-        if (!data.containsKey(key))
+        if (data.get(key) == null)
             return false;
 
         wal.append("DELETE " + key);
@@ -40,7 +40,7 @@ public class Database {
     }
 
     private boolean applyDelete(String key) {
-        return data.remove(key) != null;
+        return data.remove(key);
     }
 
     public void save() throws IOException {
@@ -50,8 +50,8 @@ public class Database {
     public void save(Path path) throws IOException {
         List<String> lines = new ArrayList<>();
 
-        for (Map.Entry<String, String> entry : data.entrySet()) {
-            lines.add(entry.getKey() + "=" + entry.getValue());
+        for (Entry<String, String> e : data.entries()) {
+            lines.add(e.getKey() + "=" + e.getValue());
         }
 
         Files.write(path, lines);

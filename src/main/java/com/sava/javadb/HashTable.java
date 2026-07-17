@@ -40,4 +40,12 @@ public class HashTable<K, V> {
 
         return false;
     }
+
+    public List<Entry<K, V>> entries() {
+        return entries;
+    }
+
+    public void clear() {
+        entries.clear();
+    }
 }
