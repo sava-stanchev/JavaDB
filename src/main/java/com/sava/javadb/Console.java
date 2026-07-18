@@ -27,14 +27,11 @@ public class Console {
             String cmd = parts[0].toUpperCase();
 
             switch (cmd) {
-                case "PUT":
-                    handlePut(input);
-                    break;
-                case "GET":
-                    handleGet(input);
-                    break;
-                case "DELETE":
-                    handleDelete(input);
+                case "EXIT":
+                    System.out.println("Goodbye!");
+                    return;
+                case "HELP":
+                    showHelp();
                     break;
                 case "SAVE":
                     saveDb();
@@ -45,15 +42,20 @@ public class Console {
                 case "CHECKPOINT":
                     checkpointDb();
                     break;
-                case "HELP":
-                    showHelp();
-                    break;
-                case "EXIT":
-                    System.out.println("Goodbye!");
-                    return;
                 default:
-                    System.out.println("Unknown command.");
-                    System.out.println("Type HELP to see available commands.");
+                    try {
+                        Command command = parser.parse(input);
+
+                        if (command instanceof PutCommand put) {
+                            handlePut(put);
+                        } else if (command instanceof GetCommand get) {
+                            handleGet(get);
+                        } else if (command instanceof DeleteCommand delete) {
+                            handleDelete(delete);
+                        }
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
             }
         }
     }
@@ -70,44 +72,24 @@ public class Console {
         System.out.println("EXIT - Exit JavaDB");
     }
 
-    private void handlePut(String input) {
+    private void handlePut(PutCommand put) {
         try {
-            Command cmd = parser.parse(input);
-
-            if (cmd instanceof PutCommand put) {
-                db.put(put.getKey(), put.getValue());
-                System.out.println("OK");
-            }
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            db.put(put.getKey(), put.getValue());
+            System.out.println("OK");
         } catch (IOException e) {
             System.out.println("PUT failed: " + e.getMessage());
         }
     }
 
-    private void handleGet(String input) {
-        try {
-            Command cmd = parser.parse(input);
-
-            if (cmd instanceof GetCommand get) {
-                String val = db.get(get.getKey());
-                System.out.println(val != null ? val : "Key not found.");
-            }
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
+    private void handleGet(GetCommand get) {
+        String val = db.get(get.getKey());
+        System.out.println(val != null ? val : "Key not found.");
     }
 
-    private void handleDelete(String input) {
+    private void handleDelete(DeleteCommand delete) {
         try {
-            Command cmd = parser.parse(input);
-
-            if (cmd instanceof DeleteCommand delete) {
-                boolean isDeleted = db.delete(delete.getKey());
-                System.out.println(isDeleted ? "OK" : "Key not found.");
-            }
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
+            boolean isDeleted = db.delete(delete.getKey());
+            System.out.println(isDeleted ? "OK" : "Key not found.");
         } catch (IOException e) {
             System.out.println("DELETE failed: " + e.getMessage());
         }
