@@ -18,7 +18,7 @@ The goal is to understand how databases work internally by implementing the core
 * [x] Persistent storage
 * [x] Write-ahead logging (WAL)
 * [x] Checkpointing
-* [ ] Indexes
+* [x] Indexes
 * [ ] SQL parser
 * [ ] Tables and schemas
 * [ ] Transactions
