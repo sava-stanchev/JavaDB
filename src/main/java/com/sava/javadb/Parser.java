@@ -14,6 +14,10 @@ public class Parser {
                 if (parts.length != 2)
                     throw new IllegalArgumentException("Usage: GET <key>");
                 return new GetCommand(parts[1]);
+            case "DELETE":
+                if (parts.length != 2)
+                    throw new IllegalArgumentException("Usage: DELETE <key>");
+                return new DeleteCommand(parts[1]);
             default:
                 throw new IllegalArgumentException("Unknown command.");
         }

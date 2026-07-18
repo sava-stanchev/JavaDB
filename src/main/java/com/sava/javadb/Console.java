@@ -34,7 +34,7 @@ public class Console {
                     handleGet(input);
                     break;
                 case "DELETE":
-                    handleDelete(parts);
+                    handleDelete(input);
                     break;
                 case "SAVE":
                     saveDb();
@@ -98,16 +98,18 @@ public class Console {
         }
     }
 
-    private void handleDelete(String[] parts) {
-        if (parts.length == 2) {
-            try {
-                boolean isDeleted = db.delete(parts[1]);
+    private void handleDelete(String input) {
+        try {
+            Command cmd = parser.parse(input);
+
+            if (cmd instanceof DeleteCommand delete) {
+                boolean isDeleted = db.delete(delete.getKey());
                 System.out.println(isDeleted ? "OK" : "Key not found.");
-            } catch (IOException e) {
-                System.out.println("DELETE failed: " + e.getMessage());
             }
-        } else {
-            System.out.println("Usage: DELETE <key>");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println("DELETE failed: " + e.getMessage());
         }
     }
 

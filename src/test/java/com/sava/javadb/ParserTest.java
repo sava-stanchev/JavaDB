@@ -35,6 +35,13 @@ public class ParserTest {
     }
 
     @Test
+    void parseValidDelete() {
+        Command cmd = parser.parse("DELETE name");
+        DeleteCommand delete = assertInstanceOf(DeleteCommand.class, cmd);
+        assertEquals("name", delete.getKey());
+    }
+
+    @Test
     void rejectUnknownCmd() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("HELLO"));
         assertEquals("Unknown command.", e.getMessage());
