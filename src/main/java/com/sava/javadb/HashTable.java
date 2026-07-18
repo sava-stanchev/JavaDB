@@ -4,25 +4,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HashTable<K, V> {
-    private final List<Entry<K, V>> entries;
+    private final List<List<Entry<K, V>>> buckets;
 
     public HashTable() {
-        entries = new ArrayList<>();
+        buckets = new ArrayList<>();
+        for (int i = 0; i < 16; i++) {
+            buckets.add(new ArrayList<>());
+        }
+    }
+
+    private int bucketIdx(K key) {
+        return Math.abs(key.hashCode()) % buckets.size();
     }
 
     public V get(K key) {
-        for (Entry<K, V> entry : entries) {
-            if (entry.getKey().equals(key))
-                return entry.getValue();
+        int bucket = bucketIdx(key);
+        List<Entry<K, V>> entries = buckets.get(bucket);
+
+        for (Entry<K, V> e : entries) {
+            if (e.getKey().equals(key))
+                return e.getValue();
         }
 
         return null;
     }
 
     public void put(K key, V val) {
-        for (Entry<K, V> entry : entries) {
-            if (entry.getKey().equals(key)) {
-                entry.setValue(val);
+        int bucket = bucketIdx(key);
+        List<Entry<K, V>> entries = buckets.get(bucket);
+
+        for (Entry<K, V> e : entries) {
+            if (e.getKey().equals(key)) {
+                e.setValue(val);
                 return;
             }
         }
@@ -31,6 +44,9 @@ public class HashTable<K, V> {
     }
 
     public boolean remove(K key) {
+        int bucket = bucketIdx(key);
+        List<Entry<K, V>> entries = buckets.get(bucket);
+
         for (int i = 0; i < entries.size(); i++) {
             if (entries.get(i).getKey().equals(key)) {
                 entries.remove(i);
@@ -42,10 +58,17 @@ public class HashTable<K, V> {
     }
 
     public List<Entry<K, V>> entries() {
-        return entries;
+        List<Entry<K, V>> allEntries = new ArrayList<>();
+        for (List<Entry<K, V>> bucket : buckets) {
+            allEntries.addAll(bucket);
+        }
+
+        return allEntries;
     }
 
     public void clear() {
-        entries.clear();
+        for (List<Entry<K, V>> bucket : buckets) {
+            bucket.clear();
+        }
     }
 }

@@ -59,4 +59,39 @@ public class HashTableTest {
         assertEquals("2", table.get("b"));
         assertEquals("3", table.get("c"));
     }
+
+    @Test
+    void handlesCollisions() {
+        // same hash for all keys
+        HashTable<BadKey, String> table = new HashTable<>();
+        table.put(new BadKey("A"), "one");
+        table.put(new BadKey("B"), "two");
+        table.put(new BadKey("C"), "three");
+
+        assertEquals("one", table.get(new BadKey("A")));
+        assertEquals("two", table.get(new BadKey("B")));
+        assertEquals("three", table.get(new BadKey("C")));
+    }
+
+    // forces collisions - always same hash but keys can still differ
+    private static class BadKey {
+        private final String key;
+
+        BadKey(String key) {
+            this.key = key;
+        }
+
+        @Override
+        public int hashCode() {
+            return 1; // same bucket every time
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof BadKey other))
+                return false;
+
+            return key.equals(other.key);
+        }
+    }
 }
