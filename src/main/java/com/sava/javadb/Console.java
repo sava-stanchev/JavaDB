@@ -6,10 +6,12 @@ import java.util.Scanner;
 public class Console {
     private final Database db;
     private final Scanner sc;
+    private final Parser parser;
 
     public Console(Database db) {
         this.db = db;
         sc = new Scanner(System.in);
+        this.parser = new Parser();
     }
 
     public void start() {
@@ -26,7 +28,7 @@ public class Console {
 
             switch (cmd) {
                 case "PUT":
-                    handlePut(parts);
+                    handlePut(input);
                     break;
                 case "GET":
                     handleGet(parts);
@@ -68,16 +70,18 @@ public class Console {
         System.out.println("EXIT - Exit JavaDB");
     }
 
-    private void handlePut(String[] parts) {
-        if (parts.length == 3) {
-            try {
-                db.put(parts[1], parts[2]);
+    private void handlePut(String input) {
+        try {
+            Command cmd = parser.parse(input);
+
+            if (cmd instanceof PutCommand put) {
+                db.put(put.getKey(), put.getValue());
                 System.out.println("OK");
-            } catch (IOException e) {
-                System.out.println("PUT failed: " + e.getMessage());
             }
-        } else {
-            System.out.println("Usage: PUT <key> <value>");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println("PUT failed: " + e.getMessage());
         }
     }
 
