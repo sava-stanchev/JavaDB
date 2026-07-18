@@ -23,11 +23,13 @@ public class ParserTest {
 
     @Test
     void rejectUnknownCmd() {
-        assertThrows(IllegalArgumentException.class, () -> parser.parse("HELLO"));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("HELLO"));
+        assertEquals("Unknown command.", e.getMessage());
     }
 
     @Test
     void rejectInvalidPut() {
-        assertThrows(IllegalArgumentException.class, () -> parser.parse("PUT name"));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("PUT name"));
+        assertEquals("Usage: PUT <key> <value>", e.getMessage());
     }
 }
