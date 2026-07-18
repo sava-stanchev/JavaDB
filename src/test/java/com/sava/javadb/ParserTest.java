@@ -22,14 +22,22 @@ public class ParserTest {
     }
 
     @Test
+    void rejectInvalidPut() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("PUT name"));
+        assertEquals("Usage: PUT <key> <value>", e.getMessage());
+    }
+
+    @Test
+    void parseValidGet() {
+        Command cmd = parser.parse("GET name");
+        GetCommand get = assertInstanceOf(GetCommand.class, cmd);
+        assertEquals("name", get.getKey());
+    }
+
+    @Test
     void rejectUnknownCmd() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("HELLO"));
         assertEquals("Unknown command.", e.getMessage());
     }
 
-    @Test
-    void rejectInvalidPut() {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("PUT name"));
-        assertEquals("Usage: PUT <key> <value>", e.getMessage());
-    }
 }

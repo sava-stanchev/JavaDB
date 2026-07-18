@@ -31,7 +31,7 @@ public class Console {
                     handlePut(input);
                     break;
                 case "GET":
-                    handleGet(parts);
+                    handleGet(input);
                     break;
                 case "DELETE":
                     handleDelete(parts);
@@ -85,12 +85,16 @@ public class Console {
         }
     }
 
-    private void handleGet(String[] parts) {
-        if (parts.length == 2) {
-            String val = db.get(parts[1]);
-            System.out.println(val != null ? val : "Key not found.");
-        } else {
-            System.out.println("Usage: GET <key>");
+    private void handleGet(String input) {
+        try {
+            Command cmd = parser.parse(input);
+
+            if (cmd instanceof GetCommand get) {
+                String val = db.get(get.getKey());
+                System.out.println(val != null ? val : "Key not found.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
         }
     }
 
