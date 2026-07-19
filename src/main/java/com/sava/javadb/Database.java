@@ -10,10 +10,12 @@ public class Database {
     private static final Path DB_FILE = Path.of("database.db");
     private final WriteAheadLog wal;
     private final HashTable<String, String> data;
+    private final HashTable<String, Table> tables;
 
     public Database(WriteAheadLog wal) {
         this.wal = wal;
         data = new HashTable<>();
+        tables = new HashTable<>();
     }
 
     public void put(String key, String val) throws IOException {
@@ -90,5 +92,13 @@ public class Database {
     public void checkpoint() throws IOException {
         save(DB_FILE);
         wal.clear();
+    }
+
+    public void createTable(String name) {
+        tables.put(name, new Table());
+    }
+
+    public Table getTable(String name) {
+        return tables.get(name);
     }
 }

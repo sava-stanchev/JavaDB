@@ -77,4 +77,16 @@ public class DatabaseTest {
         assertNull(db2.get("oldKey"));
         assertEquals("Sava", db2.get("name"));
     }
+
+    @Test
+    void createAndRetrieveTable() {
+        db.createTable("users");
+        Table tbl = db.getTable("users");
+        assertNotNull(tbl);
+    }
+
+    @Test
+    void nullWhenMissingTable() {
+        assertNull(db.getTable("users"));
+    }
 }

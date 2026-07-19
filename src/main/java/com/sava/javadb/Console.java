@@ -52,6 +52,8 @@ public class Console {
                             handleGet(get);
                         } else if (command instanceof DeleteCommand delete) {
                             handleDelete(delete);
+                        } else if (command instanceof CreateTableCmd create) {
+                            handleCreateTable(create);
                         }
                     } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
@@ -65,6 +67,7 @@ public class Console {
         System.out.println("PUT <key> <value> - Store a value");
         System.out.println("GET <key> - Retrieve a value");
         System.out.println("DELETE <key> - Delete a key");
+        System.out.println("CREATE TABLE <name> - Create a table");
         System.out.println("SAVE - Save database to disk");
         System.out.println("LOAD - Load database from disk");
         System.out.println("CHECKPOINT - Save snapshot and clear WAL");
@@ -93,6 +96,11 @@ public class Console {
         } catch (IOException e) {
             System.out.println("DELETE failed: " + e.getMessage());
         }
+    }
+
+    private void handleCreateTable(CreateTableCmd create) {
+        db.createTable(create.getTableName());
+        System.out.println("OK");
     }
 
     private void saveDb() {

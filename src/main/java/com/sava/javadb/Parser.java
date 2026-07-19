@@ -18,6 +18,10 @@ public class Parser {
                 if (parts.length != 2)
                     throw new IllegalArgumentException("Usage: DELETE <key>");
                 return new DeleteCommand(parts[1]);
+            case "CREATE":
+                if (parts.length != 3 || !parts[1].equalsIgnoreCase("TABLE"))
+                    throw new IllegalArgumentException("Usage: CREATE TABLE <name>");
+                return new CreateTableCmd(parts[2]);
             default:
                 throw new IllegalArgumentException("Unknown command.");
         }

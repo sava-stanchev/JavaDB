@@ -47,4 +47,16 @@ public class ParserTest {
         assertEquals("Unknown command.", e.getMessage());
     }
 
+    @Test
+    void createTable() {
+        Command cmd = parser.parse("CREATE TABLE users");
+        CreateTableCmd create = assertInstanceOf(CreateTableCmd.class, cmd);
+        assertEquals("users", create.getTableName());
+    }
+
+    @Test
+    void invalidCreateTable() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("CREATE users"));
+        assertEquals("Usage: CREATE TABLE <name>", e.getMessage());
+    }
 }
