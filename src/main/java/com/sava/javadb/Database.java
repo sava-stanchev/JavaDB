@@ -101,4 +101,11 @@ public class Database {
     public Table getTable(String name) {
         return tables.get(name);
     }
+
+    public void insert(String tableName, Row row) {
+        Table table = getTable(tableName);
+        if (table == null)
+            throw new IllegalArgumentException("Table does not exist.");
+        table.addRow(row);
+    }
 }

@@ -89,4 +89,23 @@ public class DatabaseTest {
     void nullWhenMissingTable() {
         assertNull(db.getTable("users"));
     }
+
+    @Test
+    void insertRowSuccess() {
+        db.createTable("users");
+        Row row = new Row();
+        row.put("name", "Sava");
+        db.insert("users", row);
+        Table users = db.getTable("users");
+        assertEquals(1, users.size());
+        assertEquals("Sava", users.rows().get(0).get("name"));
+    }
+
+    @Test
+    void insertRowFail() {
+        Row row = new Row();
+        row.put("name", "Sava");
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> db.insert("users", row));
+        assertEquals("Table does not exist.", e.getMessage());
+    }
 }

@@ -59,4 +59,15 @@ public class ParserTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("CREATE users"));
         assertEquals("Usage: CREATE TABLE <name>", e.getMessage());
     }
+
+    @Test
+    void insertRow() {
+        Command cmd = parser.parse("INSERT users name=Sava city=Sofia");
+        InsertRowCmd insert = assertInstanceOf(InsertRowCmd.class, cmd);
+        assertEquals("users", insert.getTableName());
+
+        Row row = insert.getRow();
+        assertEquals("Sava", row.get("name"));
+        assertEquals("Sofia", row.get("city"));
+    }
 }

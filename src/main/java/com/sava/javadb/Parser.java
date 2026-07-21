@@ -22,6 +22,21 @@ public class Parser {
                 if (parts.length != 3 || !parts[1].equalsIgnoreCase("TABLE"))
                     throw new IllegalArgumentException("Usage: CREATE TABLE <name>");
                 return new CreateTableCmd(parts[2]);
+            case "INSERT":
+                if (parts.length < 3)
+                    throw new IllegalArgumentException("Usage: INSERT <table> <column=value>...");
+
+                String tableName = parts[1];
+                Row row = new Row();
+
+                for (int i = 2; i < parts.length; i++) {
+                    String[] pair = parts[i].split("=");
+                    if (pair.length != 2 || pair[0].isBlank() || pair[1].isBlank())
+                        throw new IllegalArgumentException("Columns must be in the form column=value");
+                    row.put(pair[0], pair[1]);
+                }
+
+                return new InsertRowCmd(tableName, row);
             default:
                 throw new IllegalArgumentException("Unknown command.");
         }
