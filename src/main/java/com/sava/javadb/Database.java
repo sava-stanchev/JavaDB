@@ -108,4 +108,11 @@ public class Database {
             throw new IllegalArgumentException("Table does not exist.");
         table.addRow(row);
     }
+
+    public List<Row> select(String tableName) {
+        Table table = getTable(tableName);
+        if (table == null)
+            throw new IllegalArgumentException("Table does not exist.");
+        return table.rows();
+    }
 }

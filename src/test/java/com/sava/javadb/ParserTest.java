@@ -70,4 +70,17 @@ public class ParserTest {
         assertEquals("Sava", row.get("name"));
         assertEquals("Sofia", row.get("city"));
     }
+
+    @Test
+    void validSelect() {
+        Command cmd = parser.parse("SELECT * FROM users");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertEquals("users", select.getTableName());
+    }
+
+    @Test
+    void invalidSelect() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("SELECT users"));
+        assertEquals("Usage: SELECT * FROM <table>", e.getMessage());
+    }
 }

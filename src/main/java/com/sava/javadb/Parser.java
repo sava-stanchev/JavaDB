@@ -37,6 +37,10 @@ public class Parser {
                 }
 
                 return new InsertRowCmd(tableName, row);
+            case "SELECT":
+                if (parts.length != 4 || !parts[1].equals("*") || !parts[2].equalsIgnoreCase("FROM"))
+                    throw new IllegalArgumentException("Usage: SELECT * FROM <table>");
+                return new SelectCmd(parts[3]);
             default:
                 throw new IllegalArgumentException("Unknown command.");
         }

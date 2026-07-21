@@ -6,6 +6,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -107,5 +108,23 @@ public class DatabaseTest {
         row.put("name", "Sava");
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> db.insert("users", row));
         assertEquals("Table does not exist.", e.getMessage());
+    }
+
+    @Test
+    void throwWhenSelectMissingTable() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> db.select("users"));
+        assertEquals("Table does not exist.", e.getMessage());
+    }
+
+    @Test
+    void selectReturnsRows() {
+        db.createTable("users");
+        Row row = new Row();
+        row.put("name", "Sava");
+        db.insert("users", row);
+        List<Row> rows = db.select("users");
+
+        assertEquals(1, rows.size());
+        assertEquals("Sava", rows.get(0).get("name"));
     }
 }

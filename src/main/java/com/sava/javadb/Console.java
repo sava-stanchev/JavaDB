@@ -1,6 +1,7 @@
 package com.sava.javadb;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 public class Console {
@@ -56,6 +57,8 @@ public class Console {
                             handleCreateTable(create);
                         } else if (command instanceof InsertRowCmd insert) {
                             handleInsert(insert);
+                        } else if (command instanceof SelectCmd select) {
+                            handleSelect(select);
                         }
                     } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
@@ -71,6 +74,7 @@ public class Console {
         System.out.println("DELETE <key> - Delete a key");
         System.out.println("CREATE TABLE <name> - Create a table");
         System.out.println("INSERT <table> <column=value>... - Insert a row");
+        System.out.println("SELECT * FROM <table> - Retrieve all rows");
         System.out.println("SAVE - Save database to disk");
         System.out.println("LOAD - Load database from disk");
         System.out.println("CHECKPOINT - Save snapshot and clear WAL");
@@ -109,6 +113,13 @@ public class Console {
     private void handleInsert(InsertRowCmd insert) {
         db.insert(insert.getTableName(), insert.getRow());
         System.out.println("OK");
+    }
+
+    private void handleSelect(SelectCmd select) {
+        List<Row> rows = db.select(select.getTableName());
+        for (Row row : rows) {
+            System.out.println(row);
+        }
     }
 
     private void saveDb() {
