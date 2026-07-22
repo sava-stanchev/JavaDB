@@ -21,6 +21,10 @@ public class Row {
         return vals.remove(col);
     }
 
+    public List<Entry<String, String>> entries() {
+        return vals.entries();
+    }
+
     @Override
     public String toString() {
         List<Entry<String, String>> entries = vals.entries();

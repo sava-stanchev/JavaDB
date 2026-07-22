@@ -1,5 +1,8 @@
 package com.sava.javadb;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Parser {
     public Command parse(String input) {
         String[] parts = input.split("\\s+");
@@ -19,9 +22,22 @@ public class Parser {
                     throw new IllegalArgumentException("Usage: DELETE <key>");
                 return new DeleteCommand(parts[1]);
             case "CREATE":
-                if (parts.length != 3 || !parts[1].equalsIgnoreCase("TABLE"))
-                    throw new IllegalArgumentException("Usage: CREATE TABLE <name>");
-                return new CreateTableCmd(parts[2]);
+                if (parts.length < 4 || !parts[1].equalsIgnoreCase("TABLE"))
+                    throw new IllegalArgumentException("Usage: CREATE TABLE <name> (<column>, ...)");
+
+                String rest = input.substring("CREATE TABLE".length()).trim();
+                int open = rest.indexOf('(');
+                int close = rest.indexOf(')');
+                String tblName = rest.substring(0, open).trim();
+                String colText = rest.substring(open + 1, close);
+                String[] names = colText.split(",");
+                List<Column> cols = new ArrayList<>();
+
+                for (String name : names) {
+                    cols.add(new Column(name.trim()));
+                }
+
+                return new CreateTableCmd(tblName, cols);
             case "INSERT":
                 if (parts.length < 3)
                     throw new IllegalArgumentException("Usage: INSERT <table> <column=value>...");

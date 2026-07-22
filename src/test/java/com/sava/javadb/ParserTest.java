@@ -49,7 +49,7 @@ public class ParserTest {
 
     @Test
     void createTable() {
-        Command cmd = parser.parse("CREATE TABLE users");
+        Command cmd = parser.parse("CREATE TABLE users (name, city)");
         CreateTableCmd create = assertInstanceOf(CreateTableCmd.class, cmd);
         assertEquals("users", create.getTableName());
     }
@@ -57,7 +57,7 @@ public class ParserTest {
     @Test
     void invalidCreateTable() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("CREATE users"));
-        assertEquals("Usage: CREATE TABLE <name>", e.getMessage());
+        assertEquals("Usage: CREATE TABLE <name> (<column>, ...)", e.getMessage());
     }
 
     @Test

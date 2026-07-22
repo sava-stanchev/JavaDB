@@ -94,8 +94,8 @@ public class Database {
         wal.clear();
     }
 
-    public void createTable(String name) {
-        tables.put(name, new Table());
+    public void createTable(String name, List<Column> cols) {
+        tables.put(name, new Table(cols));
     }
 
     public Table getTable(String name) {
@@ -106,6 +106,12 @@ public class Database {
         Table table = getTable(tableName);
         if (table == null)
             throw new IllegalArgumentException("Table does not exist.");
+
+        for (Entry<String, String> e : row.entries()) {
+            if (!table.hasColumn(e.getKey()))
+                throw new IllegalArgumentException("Unknown column: " + e.getKey());
+        }
+
         table.addRow(row);
     }
 

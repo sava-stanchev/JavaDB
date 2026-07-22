@@ -72,7 +72,7 @@ public class Console {
         System.out.println("PUT <key> <value> - Store a value");
         System.out.println("GET <key> - Retrieve a value");
         System.out.println("DELETE <key> - Delete a key");
-        System.out.println("CREATE TABLE <name> - Create a table");
+        System.out.println("CREATE TABLE <name> (<column>, ...) - Create a table");
         System.out.println("INSERT <table> <column=value>... - Insert a row");
         System.out.println("SELECT * FROM <table> - Retrieve all rows");
         System.out.println("SAVE - Save database to disk");
@@ -106,7 +106,7 @@ public class Console {
     }
 
     private void handleCreateTable(CreateTableCmd create) {
-        db.createTable(create.getTableName());
+        db.createTable(create.getTableName(), create.getColumns());
         System.out.println("OK");
     }
 

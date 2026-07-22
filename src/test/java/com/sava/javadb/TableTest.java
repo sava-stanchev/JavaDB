@@ -3,6 +3,9 @@ package com.sava.javadb;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TableTest {
@@ -10,7 +13,10 @@ public class TableTest {
 
     @BeforeEach
     void setUp() {
-        table = new Table();
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("name"));
+        cols.add(new Column("city"));
+        table = new Table(cols);
     }
 
     @Test

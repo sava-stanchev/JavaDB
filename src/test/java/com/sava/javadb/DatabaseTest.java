@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -81,7 +83,10 @@ public class DatabaseTest {
 
     @Test
     void createAndRetrieveTable() {
-        db.createTable("users");
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("name"));
+        cols.add(new Column("city"));
+        db.createTable("users", cols);
         Table tbl = db.getTable("users");
         assertNotNull(tbl);
     }
@@ -93,10 +98,14 @@ public class DatabaseTest {
 
     @Test
     void insertRowSuccess() {
-        db.createTable("users");
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("name"));
+        cols.add(new Column("city"));
+        db.createTable("users", cols);
         Row row = new Row();
         row.put("name", "Sava");
         db.insert("users", row);
+
         Table users = db.getTable("users");
         assertEquals(1, users.size());
         assertEquals("Sava", users.rows().get(0).get("name"));
@@ -111,6 +120,19 @@ public class DatabaseTest {
     }
 
     @Test
+    void unknownCol() {
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("name"));
+        db.createTable("users", cols);
+
+        Row row = new Row();
+        row.put("age", "32");
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> db.insert("users", row));
+        assertEquals("Unknown column: age", e.getMessage());
+    }
+
+    @Test
     void throwWhenSelectMissingTable() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> db.select("users"));
         assertEquals("Table does not exist.", e.getMessage());
@@ -118,7 +140,10 @@ public class DatabaseTest {
 
     @Test
     void selectReturnsRows() {
-        db.createTable("users");
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("name"));
+        cols.add(new Column("city"));
+        db.createTable("users", cols);
         Row row = new Row();
         row.put("name", "Sava");
         db.insert("users", row);
