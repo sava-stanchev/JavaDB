@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,8 +83,8 @@ public class DatabaseTest {
     @Test
     void createAndRetrieveTable() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("name"));
-        cols.add(new Column("city"));
+        cols.add(new Column("name", "TEXT"));
+        cols.add(new Column("city", "TEXT"));
         db.createTable("users", cols);
         Table tbl = db.getTable("users");
         assertNotNull(tbl);
@@ -99,8 +98,8 @@ public class DatabaseTest {
     @Test
     void insertRowSuccess() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("name"));
-        cols.add(new Column("city"));
+        cols.add(new Column("name", "TEXT"));
+        cols.add(new Column("city", "TEXT"));
         db.createTable("users", cols);
         Row row = new Row();
         row.put("name", "Sava");
@@ -122,7 +121,7 @@ public class DatabaseTest {
     @Test
     void unknownCol() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("name"));
+        cols.add(new Column("name", "TEXT"));
         db.createTable("users", cols);
 
         Row row = new Row();
@@ -141,8 +140,8 @@ public class DatabaseTest {
     @Test
     void selectReturnsRows() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("name"));
-        cols.add(new Column("city"));
+        cols.add(new Column("name", "TEXT"));
+        cols.add(new Column("city", "TEXT"));
         db.createTable("users", cols);
         Row row = new Row();
         row.put("name", "Sava");

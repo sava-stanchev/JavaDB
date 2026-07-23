@@ -34,7 +34,8 @@ public class Parser {
                 List<Column> cols = new ArrayList<>();
 
                 for (String name : names) {
-                    cols.add(new Column(name.trim()));
+                    String[] pieces = name.trim().split("\\s+");
+                    cols.add(new Column(pieces[0], pieces[1]));
                 }
 
                 return new CreateTableCmd(tblName, cols);

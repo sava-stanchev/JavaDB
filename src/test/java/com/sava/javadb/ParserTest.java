@@ -49,9 +49,11 @@ public class ParserTest {
 
     @Test
     void createTable() {
-        Command cmd = parser.parse("CREATE TABLE users (name, city)");
+        Command cmd = parser.parse("CREATE TABLE users (name TEXT, city TEXT)");
         CreateTableCmd create = assertInstanceOf(CreateTableCmd.class, cmd);
         assertEquals("users", create.getTableName());
+        assertEquals("name", create.getColumns().get(0).getName());
+        assertEquals("TEXT", create.getColumns().get(0).getType());
     }
 
     @Test

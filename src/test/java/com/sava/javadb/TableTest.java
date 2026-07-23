@@ -14,8 +14,8 @@ public class TableTest {
     @BeforeEach
     void setUp() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("name"));
-        cols.add(new Column("city"));
+        cols.add(new Column("name", "TEXT"));
+        cols.add(new Column("city", "TEXT"));
         table = new Table(cols);
     }
 
