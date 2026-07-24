@@ -151,4 +151,26 @@ public class DatabaseTest {
         assertEquals(1, rows.size());
         assertEquals("Sava", rows.get(0).get("name"));
     }
+
+    @Test
+    void validIntCol() {
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("age", "INT"));
+        db.createTable("users", cols);
+        Row row = new Row();
+        row.put("age", "25");
+        db.insert("users", row);
+    }
+
+    @Test
+    void invalidIntCol() {
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("age", "INT"));
+        db.createTable("users", cols);
+        Row row = new Row();
+        row.put("age", "hello");
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> db.insert("users", row));
+        assertEquals("Invalid value for column: age", e.getMessage());
+    }
 }

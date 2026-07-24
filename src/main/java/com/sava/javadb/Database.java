@@ -108,8 +108,11 @@ public class Database {
             throw new IllegalArgumentException("Table does not exist.");
 
         for (Entry<String, String> e : row.entries()) {
-            if (!table.hasColumn(e.getKey()))
+            Column col = table.getCol(e.getKey());
+            if (col == null)
                 throw new IllegalArgumentException("Unknown column: " + e.getKey());
+            if (!col.isValid(e.getValue()))
+                throw new IllegalArgumentException("Invalid value for column: " + e.getKey());
         }
 
         table.addRow(row);

@@ -16,4 +16,20 @@ public class Column {
     public String getType() {
         return type;
     }
+
+    public boolean isValid(String val) {
+        switch (type) {
+            case "TEXT":
+                return true;
+            case "INT":
+                try {
+                    Integer.parseInt(val);
+                    return true;
+                } catch (NumberFormatException e) {
+                    return false;
+                }
+            default:
+                throw new IllegalArgumentException("Unknown column type: " + type);
+        }
+    }
 }

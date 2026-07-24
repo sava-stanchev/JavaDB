@@ -28,12 +28,12 @@ public class Table {
         return rows.size();
     }
 
-    public boolean hasColumn(String name) {
+    public Column getCol(String name) {
         for (Column col : cols) {
             if (col.getName().equals(name))
-                return true;
+                return col;
         }
 
-        return false;
+        return null;
     }
 }
