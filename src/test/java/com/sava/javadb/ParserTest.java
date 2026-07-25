@@ -59,6 +59,15 @@ public class ParserTest {
     }
 
     @Test
+    void createTableWithPk() {
+        Command cmd = parser.parse("CREATE TABLE users (id INT PRIMARY KEY, name TEXT)");
+        CreateTableCmd create = assertInstanceOf(CreateTableCmd.class, cmd);
+        assertEquals("users", create.getTableName());
+        assertTrue(create.getCols().get(0).isPk());
+        assertFalse(create.getCols().get(0).isNullable());
+    }
+
+    @Test
     void invalidCreateTable() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("CREATE users"));
         assertEquals("Usage: CREATE TABLE <name> (<column>, ...)", e.getMessage());

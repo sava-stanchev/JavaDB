@@ -35,15 +35,23 @@ public class Parser {
 
                 for (String name : names) {
                     String[] pieces = name.trim().split("\\s+");
-                    boolean nullable = true;
 
+                    boolean nullable = true;
                     if (pieces.length == 4 &&
                             pieces[2].equalsIgnoreCase("NOT") &&
                             pieces[3].equalsIgnoreCase("NULL")) {
                         nullable = false;
                     }
 
-                    cols.add(new Column(pieces[0], pieces[1], nullable));
+                    boolean pk = false;
+                    if (pieces.length == 4 &&
+                            pieces[2].equalsIgnoreCase("PRIMARY") &&
+                            pieces[3].equalsIgnoreCase("KEY")) {
+                        pk = true;
+                        nullable = false;
+                    }
+
+                    cols.add(new Column(pieces[0], pieces[1], nullable, pk));
                 }
 
                 return new CreateTableCmd(tblName, cols);

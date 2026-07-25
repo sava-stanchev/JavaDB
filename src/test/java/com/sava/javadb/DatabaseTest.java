@@ -83,8 +83,8 @@ public class DatabaseTest {
     @Test
     void createAndRetrieveTable() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("name", "TEXT", true));
-        cols.add(new Column("city", "TEXT", true));
+        cols.add(new Column("name", "TEXT", true, false));
+        cols.add(new Column("city", "TEXT", true, false));
         db.createTable("users", cols);
         Table tbl = db.getTable("users");
         assertNotNull(tbl);
@@ -98,8 +98,8 @@ public class DatabaseTest {
     @Test
     void insertRowSuccess() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("name", "TEXT", true));
-        cols.add(new Column("city", "TEXT", true));
+        cols.add(new Column("name", "TEXT", true, false));
+        cols.add(new Column("city", "TEXT", true, false));
         db.createTable("users", cols);
         Row row = new Row();
         row.put("name", "Sava");
@@ -121,7 +121,7 @@ public class DatabaseTest {
     @Test
     void unknownCol() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("name", "TEXT", true));
+        cols.add(new Column("name", "TEXT", true, false));
         db.createTable("users", cols);
 
         Row row = new Row();
@@ -140,8 +140,8 @@ public class DatabaseTest {
     @Test
     void selectReturnsRows() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("name", "TEXT", true));
-        cols.add(new Column("city", "TEXT", true));
+        cols.add(new Column("name", "TEXT", true, false));
+        cols.add(new Column("city", "TEXT", true, false));
         db.createTable("users", cols);
         Row row = new Row();
         row.put("name", "Sava");
@@ -155,7 +155,7 @@ public class DatabaseTest {
     @Test
     void validIntCol() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("age", "INT", true));
+        cols.add(new Column("age", "INT", true, false));
         db.createTable("users", cols);
         Row row = new Row();
         row.put("age", "25");
@@ -165,7 +165,7 @@ public class DatabaseTest {
     @Test
     void invalidIntCol() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("age", "INT", true));
+        cols.add(new Column("age", "INT", true, false));
         db.createTable("users", cols);
         Row row = new Row();
         row.put("age", "hello");
@@ -177,8 +177,8 @@ public class DatabaseTest {
     @Test
     void nullable() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("id", "INT", false));
-        cols.add(new Column("name", "TEXT", true));
+        cols.add(new Column("id", "INT", false, false));
+        cols.add(new Column("name", "TEXT", true, false));
         db.createTable("users", cols);
         Row row = new Row();
         row.put("id", "1");
@@ -188,8 +188,8 @@ public class DatabaseTest {
     @Test
     void nullableFail() {
         List<Column> cols = new ArrayList<>();
-        cols.add(new Column("id", "INT", false));
-        cols.add(new Column("name", "TEXT", true));
+        cols.add(new Column("id", "INT", false, false));
+        cols.add(new Column("name", "TEXT", true, false));
         db.createTable("users", cols);
         Row row = new Row();
         row.put("name", "Sava");

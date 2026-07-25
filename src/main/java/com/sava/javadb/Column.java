@@ -4,11 +4,13 @@ public class Column {
     private final String name;
     private final String type;
     private final boolean nullable;
+    private final boolean pk;
 
-    public Column(String name, String type, boolean nullable) {
+    public Column(String name, String type, boolean nullable, boolean pk) {
         this.name = name;
         this.type = type.toUpperCase();
         this.nullable = nullable;
+        this.pk = pk;
     }
 
     public String getName() {
@@ -37,5 +39,9 @@ public class Column {
 
     public boolean isNullable() {
         return nullable;
+    }
+
+    public boolean isPk() {
+        return pk;
     }
 }
