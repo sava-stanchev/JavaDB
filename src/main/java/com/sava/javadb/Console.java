@@ -106,7 +106,7 @@ public class Console {
     }
 
     private void handleCreateTable(CreateTableCmd create) {
-        db.createTable(create.getTableName(), create.getColumns());
+        db.createTable(create.getTableName(), create.getCols());
         System.out.println("OK");
     }
 

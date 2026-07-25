@@ -3,10 +3,12 @@ package com.sava.javadb;
 public class Column {
     private final String name;
     private final String type;
+    private final boolean nullable;
 
-    public Column(String name, String type) {
+    public Column(String name, String type, boolean nullable) {
         this.name = name;
         this.type = type.toUpperCase();
+        this.nullable = nullable;
     }
 
     public String getName() {
@@ -31,5 +33,9 @@ public class Column {
             default:
                 throw new IllegalArgumentException("Unknown column type: " + type);
         }
+    }
+
+    public boolean isNullable() {
+        return nullable;
     }
 }

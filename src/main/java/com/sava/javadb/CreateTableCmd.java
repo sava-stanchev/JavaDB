@@ -15,7 +15,7 @@ public class CreateTableCmd extends Command {
         return tableName;
     }
 
-    public List<Column> getColumns() {
+    public List<Column> getCols() {
         return cols;
     }
 }

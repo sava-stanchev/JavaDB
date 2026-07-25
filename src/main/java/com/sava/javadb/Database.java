@@ -115,6 +115,11 @@ public class Database {
                 throw new IllegalArgumentException("Invalid value for column: " + e.getKey());
         }
 
+        for (Column col : table.columns()) {
+            if (!col.isNullable() && row.get(col.getName()) == null)
+                throw new IllegalArgumentException("Missing value for column: " + col.getName());
+        }
+
         table.addRow(row);
     }
 

@@ -35,7 +35,15 @@ public class Parser {
 
                 for (String name : names) {
                     String[] pieces = name.trim().split("\\s+");
-                    cols.add(new Column(pieces[0], pieces[1]));
+                    boolean nullable = true;
+
+                    if (pieces.length == 4 &&
+                            pieces[2].equalsIgnoreCase("NOT") &&
+                            pieces[3].equalsIgnoreCase("NULL")) {
+                        nullable = false;
+                    }
+
+                    cols.add(new Column(pieces[0], pieces[1], nullable));
                 }
 
                 return new CreateTableCmd(tblName, cols);
