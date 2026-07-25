@@ -75,13 +75,27 @@ public class ParserTest {
 
     @Test
     void insertRow() {
-        Command cmd = parser.parse("INSERT users name=Sava city=Sofia");
+        Command cmd = parser.parse("INSERT INTO users (id, name) VALUES (1, 'Sava')");
         InsertRowCmd insert = assertInstanceOf(InsertRowCmd.class, cmd);
         assertEquals("users", insert.getTableName());
 
         Row row = insert.getRow();
+        assertEquals("1", row.get("id"));
         assertEquals("Sava", row.get("name"));
-        assertEquals("Sofia", row.get("city"));
+    }
+
+    @Test
+    void insertCmdWrongUsage() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> parser.parse("INSERT users (id, name) VALUES (1, 'Sava')"));
+        assertEquals("Usage: INSERT INTO <table> (<columns>) VALUES (<values>)", e.getMessage());
+    }
+
+    @Test
+    void insertCmdColValMismatch() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> parser.parse("INSERT INTO users (id, name, age) VALUES (1, 'Sava')"));
+        assertEquals("Number of columns and values must match.", e.getMessage());
     }
 
     @Test

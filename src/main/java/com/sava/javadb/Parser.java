@@ -56,20 +56,7 @@ public class Parser {
 
                 return new CreateTableCmd(tblName, cols);
             case "INSERT":
-                if (parts.length < 3)
-                    throw new IllegalArgumentException("Usage: INSERT <table> <column=value>...");
-
-                String tableName = parts[1];
-                Row row = new Row();
-
-                for (int i = 2; i < parts.length; i++) {
-                    String[] pair = parts[i].split("=");
-                    if (pair.length != 2 || pair[0].isBlank() || pair[1].isBlank())
-                        throw new IllegalArgumentException("Columns must be in the form column=value");
-                    row.put(pair[0], pair[1]);
-                }
-
-                return new InsertRowCmd(tableName, row);
+                return parseInsert(input);
             case "SELECT":
                 if (parts.length != 4 || !parts[1].equals("*") || !parts[2].equalsIgnoreCase("FROM"))
                     throw new IllegalArgumentException("Usage: SELECT * FROM <table>");
@@ -77,5 +64,46 @@ public class Parser {
             default:
                 throw new IllegalArgumentException("Unknown command.");
         }
+    }
+
+    private InsertRowCmd parseInsert(String input) {
+        String prefix = "INSERT INTO ";
+        if (!input.toUpperCase().startsWith(prefix))
+            throw new IllegalArgumentException("Usage: INSERT INTO <table> (<columns>) VALUES (<values>)");
+
+        String rest = input.substring(prefix.length()).trim();
+        int valsIdx = rest.toUpperCase().indexOf("VALUES");
+        if (valsIdx == - 1)
+            throw new IllegalArgumentException("Usage: INSERT INTO <table> (<columns>) VALUES (<values>)");
+
+        String beforeVals = rest.substring(0, valsIdx).trim();
+        String afterVals = rest.substring(valsIdx + "VALUES".length()).trim();
+
+        int open = beforeVals.indexOf('(');
+        if (open == -1)
+            throw new IllegalArgumentException("Usage: INSERT INTO <table> (<columns>) VALUES (<values>)");
+        String tblName = beforeVals.substring(0, open).trim();
+        String colText = beforeVals.substring(open + 1, beforeVals.lastIndexOf(')'));
+        if (!afterVals.startsWith("(") || !afterVals.endsWith(")"))
+            throw new IllegalArgumentException("Usage: INSERT INTO <table> (<columns>) VALUES (<values>)");
+        String valText = afterVals.substring(1, afterVals.length() - 1);
+
+        String[] cols = colText.split(",");
+        String[] vals = valText.split(",");
+        if (cols.length != vals.length)
+            throw new IllegalArgumentException("Number of columns and values must match.");
+
+        Row row = new Row();
+        for (int i = 0; i < cols.length; i++) {
+            String col = cols[i].trim();
+            String val = vals[i].trim();
+
+            if (val.startsWith("'") && val.endsWith("'"))
+                val = val.substring(1, val.length() - 1);
+
+            row.put(col, val);
+        }
+
+        return new InsertRowCmd(tblName, row);
     }
 }

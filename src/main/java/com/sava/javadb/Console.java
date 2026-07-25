@@ -73,7 +73,7 @@ public class Console {
         System.out.println("GET <key> - Retrieve a value");
         System.out.println("DELETE <key> - Delete a key");
         System.out.println("CREATE TABLE <name> (<column>, ...) - Create a table");
-        System.out.println("INSERT <table> <column=value>... - Insert a row");
+        System.out.println("INSERT INTO <table> (<columns>) VALUES (<values>) - Insert a row");
         System.out.println("SELECT * FROM <table> - Retrieve all rows");
         System.out.println("SAVE - Save database to disk");
         System.out.println("LOAD - Load database from disk");
