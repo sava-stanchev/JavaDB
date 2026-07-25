@@ -120,6 +120,19 @@ public class Database {
                 throw new IllegalArgumentException("Missing value for column: " + col.getName());
         }
 
+        Column pk = table.getPk();
+        if (pk == null) {
+            table.addRow(row);
+            return;
+        }
+
+        String newVal = row.get(pk.getName());
+        for (Row existing : table.rows()) {
+            String existingVal = existing.get(pk.getName());
+            if (newVal.equals(existingVal))
+                throw new IllegalArgumentException("Duplicate primary key: " + newVal);
+        }
+
         table.addRow(row);
     }
 

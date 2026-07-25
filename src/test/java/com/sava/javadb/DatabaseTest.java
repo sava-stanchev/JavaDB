@@ -197,4 +197,34 @@ public class DatabaseTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> db.insert("users", row));
         assertEquals("Missing value for column: id", e.getMessage());
     }
+
+    @Test
+    void pk() {
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("id", "INT", false, true));
+        cols.add(new Column("name", "TEXT", true, false));
+        db.createTable("users", cols);
+        Row row1 = new Row();
+        row1.put("id", "1");
+        Row row2 = new Row();
+        row2.put("id", "2");
+        db.insert("users", row1);
+        db.insert("users", row2);
+    }
+
+    @Test
+    void duplicatePk() {
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("id", "INT", false, true));
+        cols.add(new Column("name", "TEXT", true, false));
+        db.createTable("users", cols);
+        Row row1 = new Row();
+        row1.put("id", "1");
+        Row row2 = new Row();
+        row2.put("id", "1");
+        db.insert("users", row1);
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> db.insert("users", row2));
+        assertEquals("Duplicate primary key: 1", e.getMessage());
+    }
 }

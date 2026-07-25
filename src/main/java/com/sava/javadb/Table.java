@@ -36,4 +36,13 @@ public class Table {
 
         return null;
     }
+
+    public Column getPk() {
+        for (Column col : cols) {
+            if (col.isPk())
+                return col;
+        }
+
+        return null;
+    }
 }
