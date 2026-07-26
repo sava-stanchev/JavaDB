@@ -128,4 +128,22 @@ public class ParserTest {
                 () -> parser.parse("SELECT * FROM users WHERE id"));
         assertEquals("Usage: SELECT * FROM <table> [WHERE <column> = <value>]", e.getMessage());
     }
+
+    @Test
+    void validUpdate() {
+        Command cmd = parser.parse("UPDATE users SET name = 'Sava' WHERE id = 1");
+        UpdateCmd update = assertInstanceOf(UpdateCmd.class, cmd);
+        assertEquals("users", update.getTableName());
+        assertEquals("name", update.getSetCol());
+        assertEquals("Sava", update.getSetVal());
+        assertEquals("id", update.getWhereCol());
+        assertEquals("1", update.getWhereVal());
+    }
+
+    @Test
+    void invalidUpdate() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> parser.parse("UPDATE users name = 'Sava'"));
+        assertEquals("Usage: UPDATE <table> SET <column> = <value> WHERE <column> = <value>", e.getMessage());
+    }
 }

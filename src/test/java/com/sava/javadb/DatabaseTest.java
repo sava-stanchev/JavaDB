@@ -250,4 +250,33 @@ public class DatabaseTest {
                 () -> db.select("users","age", "25"));
         assertEquals("Unknown column: age", e.getMessage());
     }
+
+    @Test
+    void update() {
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("id", "INT", false, false));
+        cols.add(new Column("name", "TEXT", true, false));
+        cols.add(new Column("age", "INT", false, false));
+        db.createTable("users", cols);
+        Row row = new Row();
+        row.put("id", "1");
+        row.put("name", "huh");
+        row.put("age", "32");
+        db.insert("users", row);
+
+        db.update("users", "name", "Sava", "id", "1");
+
+        List<Row> rows = db.select("users", "id", "1");
+        assertEquals(1, rows.size());
+        assertEquals("Sava", rows.get(0).get("name"));
+
+
+        IllegalArgumentException e1 = assertThrows(IllegalArgumentException.class,
+                () -> db.update("users", "city", "Manila", "id", "1"));
+        assertEquals("Unknown column: city", e1.getMessage());
+
+        IllegalArgumentException e2 = assertThrows(IllegalArgumentException.class,
+                () -> db.update("users", "age", "whatever", "age", "32"));
+        assertEquals("Invalid value for column: age", e2.getMessage());
+    }
 }

@@ -153,4 +153,23 @@ public class Database {
 
         return selected;
     }
+
+    public void update(String tblName, String setCol, String setVal, String whereCol, String whereVal) {
+        Table table = getTable(tblName);
+        if (table == null)
+            throw new IllegalArgumentException("Table does not exist.");
+        if (table.getCol(setCol) == null)
+            throw new IllegalArgumentException("Unknown column: " + setCol);
+        if (table.getCol(whereCol) == null)
+            throw new IllegalArgumentException("Unknown column: " + whereCol);
+
+        Column col = table.getCol(setCol);
+        if (!col.isValid(setVal))
+            throw new IllegalArgumentException("Invalid value for column: " + setCol);
+
+        for (Row row : table.rows()) {
+            if (whereVal.equals(row.get(whereCol)))
+                row.put(setCol, setVal);
+        }
+    }
 }

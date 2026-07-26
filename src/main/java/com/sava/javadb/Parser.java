@@ -66,6 +66,8 @@ public class Parser {
                     return new SelectCmd(parts[3], parts[5], parts[7]);
 
                 throw new IllegalArgumentException("Usage: SELECT * FROM <table> [WHERE <column> = <value>]");
+            case "UPDATE":
+                return parseUpdate(input);
             default:
                 throw new IllegalArgumentException("Unknown command.");
         }
@@ -78,7 +80,7 @@ public class Parser {
 
         String rest = input.substring(prefix.length()).trim();
         int valsIdx = rest.toUpperCase().indexOf("VALUES");
-        if (valsIdx == - 1)
+        if (valsIdx == -1)
             throw new IllegalArgumentException("Usage: INSERT INTO <table> (<columns>) VALUES (<values>)");
 
         String beforeVals = rest.substring(0, valsIdx).trim();
@@ -110,5 +112,37 @@ public class Parser {
         }
 
         return new InsertRowCmd(tblName, row);
+    }
+
+    private UpdateCmd parseUpdate(String input) {
+        String prefix = "UPDATE ";
+        if (!input.toUpperCase().startsWith(prefix))
+            throw new IllegalArgumentException("Usage: UPDATE <table> SET <column> = <value> WHERE <column> = <value>");
+
+        String rest = input.substring(prefix.length()).trim();
+        int setIdx = rest.toUpperCase().indexOf("SET");
+        int whereIdx = rest.toUpperCase().indexOf("WHERE");
+        if (setIdx == -1 || whereIdx == -1)
+            throw new IllegalArgumentException("Usage: UPDATE <table> SET <column> = <value> WHERE <column> = <value>");
+
+        String tblName = rest.substring(0, setIdx).trim();
+        String setText = rest.substring(setIdx + "SET".length(), whereIdx).trim();
+        String whereText = rest.substring(whereIdx + "WHERE".length()).trim();
+        String[] setPair = setText.split("=");
+        String[] wherePair = whereText.split("=");
+        if (setPair.length != 2 || wherePair.length != 2)
+            throw new IllegalArgumentException("Usage: UPDATE <table> SET <column> = <value> WHERE <column> = <value>");
+
+        String setCol = setPair[0].trim();
+        String setVal = setPair[1].trim();
+        String whereCol = wherePair[0].trim();
+        String whereVal = wherePair[1].trim();
+
+        if (setVal.startsWith("'") && setVal.endsWith("'"))
+            setVal = setVal.substring(1, setVal.length() - 1);
+        if (whereVal.startsWith("'") && whereVal.endsWith("'"))
+            whereVal = whereVal.substring(1, whereVal.length() - 1);
+
+        return new UpdateCmd(tblName, setCol, setVal, whereCol, whereVal);
     }
 }
