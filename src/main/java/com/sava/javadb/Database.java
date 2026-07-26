@@ -136,10 +136,21 @@ public class Database {
         table.addRow(row);
     }
 
-    public List<Row> select(String tableName) {
+    public List<Row> select(String tableName, String whereCol, String whereVal) {
         Table table = getTable(tableName);
         if (table == null)
             throw new IllegalArgumentException("Table does not exist.");
-        return table.rows();
+        if (whereCol == null)
+            return table.rows();
+        if (table.getCol(whereCol) == null)
+            throw new IllegalArgumentException("Unknown column: " + whereCol);
+
+        List<Row> selected = new ArrayList<>();
+        for (Row row : table.rows()) {
+            if (whereVal.equals(row.get(whereCol)))
+                selected.add(row);
+        }
+
+        return selected;
     }
 }

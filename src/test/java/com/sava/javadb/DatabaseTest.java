@@ -133,7 +133,8 @@ public class DatabaseTest {
 
     @Test
     void throwWhenSelectMissingTable() {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> db.select("users"));
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> db.select("users", null, null));
         assertEquals("Table does not exist.", e.getMessage());
     }
 
@@ -146,7 +147,7 @@ public class DatabaseTest {
         Row row = new Row();
         row.put("name", "Sava");
         db.insert("users", row);
-        List<Row> rows = db.select("users");
+        List<Row> rows = db.select("users", null, null);
 
         assertEquals(1, rows.size());
         assertEquals("Sava", rows.get(0).get("name"));
@@ -226,5 +227,27 @@ public class DatabaseTest {
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> db.insert("users", row2));
         assertEquals("Duplicate primary key: 1", e.getMessage());
+    }
+
+    @Test
+    void selectWhereFiltering() {
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("id", "INT", false, false));
+        cols.add(new Column("name", "TEXT", true, false));
+        db.createTable("users", cols);
+        Row row = new Row();
+        row.put("id", "1");
+        db.insert("users", row);
+
+        List<Row> rows1 = db.select("users", "id", "1");
+        assertEquals(1, rows1.size());
+        assertEquals("1", rows1.get(0).get("id"));
+
+        List<Row> rows2 = db.select("users", "id", "99");
+        assertTrue(rows2.isEmpty());
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> db.select("users","age", "25"));
+        assertEquals("Unknown column: age", e.getMessage());
     }
 }

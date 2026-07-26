@@ -103,11 +103,29 @@ public class ParserTest {
         Command cmd = parser.parse("SELECT * FROM users");
         SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
         assertEquals("users", select.getTableName());
+        assertNull(select.getWhereCol());
+        assertNull(select.getWhereVal());
+    }
+
+    @Test
+    void selectWithWhere() {
+        Command cmd = parser.parse("SELECT * FROM users WHERE id = 1");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertEquals("users", select.getTableName());
+        assertEquals("id", select.getWhereCol());
+        assertEquals("1", select.getWhereVal());
     }
 
     @Test
     void invalidSelect() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("SELECT users"));
-        assertEquals("Usage: SELECT * FROM <table>", e.getMessage());
+        assertEquals("Usage: SELECT * FROM <table> [WHERE <column> = <value>]", e.getMessage());
+    }
+
+    @Test
+    void invalidSelectWhere() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> parser.parse("SELECT * FROM users WHERE id"));
+        assertEquals("Usage: SELECT * FROM <table> [WHERE <column> = <value>]", e.getMessage());
     }
 }

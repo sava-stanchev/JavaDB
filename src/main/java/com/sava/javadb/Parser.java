@@ -58,9 +58,14 @@ public class Parser {
             case "INSERT":
                 return parseInsert(input);
             case "SELECT":
-                if (parts.length != 4 || !parts[1].equals("*") || !parts[2].equalsIgnoreCase("FROM"))
-                    throw new IllegalArgumentException("Usage: SELECT * FROM <table>");
-                return new SelectCmd(parts[3]);
+                if (parts.length == 4 && parts[1].equals("*") && parts[2].equalsIgnoreCase("FROM"))
+                    return new SelectCmd(parts[3]);
+                if (parts.length == 8 && parts[1].equals("*") &&
+                        parts[2].equalsIgnoreCase("FROM") &&
+                        parts[4].equalsIgnoreCase("WHERE") && parts[6].equals("="))
+                    return new SelectCmd(parts[3], parts[5], parts[7]);
+
+                throw new IllegalArgumentException("Usage: SELECT * FROM <table> [WHERE <column> = <value>]");
             default:
                 throw new IllegalArgumentException("Unknown command.");
         }
