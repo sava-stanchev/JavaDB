@@ -35,13 +35,6 @@ public class ParserTest {
     }
 
     @Test
-    void parseValidDelete() {
-        Command cmd = parser.parse("DELETE name");
-        DeleteCommand delete = assertInstanceOf(DeleteCommand.class, cmd);
-        assertEquals("name", delete.getKey());
-    }
-
-    @Test
     void rejectUnknownCmd() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("HELLO"));
         assertEquals("Unknown command.", e.getMessage());
@@ -145,5 +138,21 @@ public class ParserTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                 () -> parser.parse("UPDATE users name = 'Sava'"));
         assertEquals("Usage: UPDATE <table> SET <column> = <value> WHERE <column> = <value>", e.getMessage());
+    }
+
+    @Test
+    void validDelete() {
+        Command cmd = parser.parse("DELETE FROM users WHERE id = 1");
+        DeleteRowCmd delete = assertInstanceOf(DeleteRowCmd.class, cmd);
+        assertEquals("users", delete.getTableName());
+        assertEquals("id", delete.getWhereCol());
+        assertEquals("1", delete.getWhereVal());
+    }
+
+    @Test
+    void invalidDelete() {
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> parser.parse("DELETE users"));
+        assertEquals("Usage: DELETE FROM <table> WHERE <column> = <value>", e.getMessage());
     }
 }

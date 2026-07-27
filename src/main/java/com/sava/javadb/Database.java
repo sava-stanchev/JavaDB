@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Database {
@@ -170,6 +171,21 @@ public class Database {
         for (Row row : table.rows()) {
             if (whereVal.equals(row.get(whereCol)))
                 row.put(setCol, setVal);
+        }
+    }
+
+    public void deleteRow(String tblName, String whereCol, String whereVal) {
+        Table table = getTable(tblName);
+        if (table == null)
+            throw new IllegalArgumentException("Table does not exist.");
+        if (table.getCol(whereCol) == null)
+            throw new IllegalArgumentException("Unknown column: " + whereCol);
+
+        Iterator<Row> it = table.rows().iterator();
+        while (it.hasNext()) {
+            Row row = it.next();
+            if (whereVal.equals(row.get(whereCol)))
+                it.remove();
         }
     }
 }

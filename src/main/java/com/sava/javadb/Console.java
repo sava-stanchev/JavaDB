@@ -51,7 +51,7 @@ public class Console {
                             handlePut(put);
                         } else if (command instanceof GetCommand get) {
                             handleGet(get);
-                        } else if (command instanceof DeleteCommand delete) {
+                        } else if (command instanceof DeleteRowCmd delete) {
                             handleDelete(delete);
                         } else if (command instanceof CreateTableCmd create) {
                             handleCreateTable(create);
@@ -96,13 +96,9 @@ public class Console {
         System.out.println(val != null ? val : "Key not found.");
     }
 
-    private void handleDelete(DeleteCommand delete) {
-        try {
-            boolean isDeleted = db.delete(delete.getKey());
-            System.out.println(isDeleted ? "OK" : "Key not found.");
-        } catch (IOException e) {
-            System.out.println("DELETE failed: " + e.getMessage());
-        }
+    private void handleDelete(DeleteRowCmd delete) {
+        db.deleteRow(delete.getTableName(), delete.getWhereCol(), delete.getWhereVal());
+        System.out.println("OK");
     }
 
     private void handleCreateTable(CreateTableCmd create) {

@@ -279,4 +279,33 @@ public class DatabaseTest {
                 () -> db.update("users", "age", "whatever", "age", "32"));
         assertEquals("Invalid value for column: age", e2.getMessage());
     }
+
+    @Test
+    void delete() {
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("id", "INT", false, false));
+        db.createTable("users", cols);
+
+        Row row1 = new Row();
+        row1.put("id", "1");
+        db.insert("users", row1);
+        Row row2 = new Row();
+        row2.put("id", "2");
+        db.insert("users", row2);
+
+        db.deleteRow("users", "id", "1");
+
+        List<Row> rows = db.select("users", null, null);
+        assertEquals(1, rows.size());
+        assertEquals("2", rows.get(0).get("id"));
+
+
+        IllegalArgumentException e1 = assertThrows(IllegalArgumentException.class,
+                () -> db.deleteRow("users", "age", "32"));
+        assertEquals("Unknown column: age", e1.getMessage());
+
+        db.deleteRow("users", "id", "19612");
+        rows = db.select("users", null, null);
+        assertEquals(1, rows.size());
+    }
 }

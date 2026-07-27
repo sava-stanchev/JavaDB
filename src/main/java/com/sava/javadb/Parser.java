@@ -18,9 +18,7 @@ public class Parser {
                     throw new IllegalArgumentException("Usage: GET <key>");
                 return new GetCommand(parts[1]);
             case "DELETE":
-                if (parts.length != 2)
-                    throw new IllegalArgumentException("Usage: DELETE <key>");
-                return new DeleteCommand(parts[1]);
+                return parseDelete(input);
             case "CREATE":
                 if (parts.length < 4 || !parts[1].equalsIgnoreCase("TABLE"))
                     throw new IllegalArgumentException("Usage: CREATE TABLE <name> (<column>, ...)");
@@ -144,5 +142,30 @@ public class Parser {
             whereVal = whereVal.substring(1, whereVal.length() - 1);
 
         return new UpdateCmd(tblName, setCol, setVal, whereCol, whereVal);
+    }
+
+    private DeleteRowCmd parseDelete(String input) {
+        String prefix = "DELETE FROM ";
+        if (!input.toUpperCase().startsWith(prefix))
+            throw new IllegalArgumentException("Usage: DELETE FROM <table> WHERE <column> = <value>");
+
+        String rest = input.substring(prefix.length()).trim();
+        int whereIdx = rest.toUpperCase().indexOf("WHERE");
+        if (whereIdx == -1)
+            throw new IllegalArgumentException("Usage: DELETE FROM <table> WHERE <column> = <value>");
+
+        String tblName = rest.substring(0, whereIdx).trim();
+        String whereText = rest.substring(whereIdx + "WHERE".length()).trim();
+        String[] wherePair = whereText.split("=");
+        if (wherePair.length != 2)
+            throw new IllegalArgumentException("Usage: DELETE FROM <table> WHERE <column> = <value>");
+
+        String whereCol = wherePair[0].trim();
+        String whereVal = wherePair[1].trim();
+
+        if (whereVal.startsWith("'") && whereVal.endsWith("'"))
+            whereVal = whereVal.substring(1, whereVal.length() - 1);
+
+        return new DeleteRowCmd(tblName, whereCol, whereVal);
     }
 }
