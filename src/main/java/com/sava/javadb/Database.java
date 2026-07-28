@@ -137,22 +137,42 @@ public class Database {
         table.addRow(row);
     }
 
-    public List<Row> select(String tableName, String whereCol, String whereVal) {
-        Table table = getTable(tableName);
+    public List<Row> select(List<String> cols, String tblName, String whereCol, String whereVal) {
+        Table table = getTable(tblName);
         if (table == null)
             throw new IllegalArgumentException("Table does not exist.");
-        if (whereCol == null)
-            return table.rows();
-        if (table.getCol(whereCol) == null)
-            throw new IllegalArgumentException("Unknown column: " + whereCol);
 
-        List<Row> selected = new ArrayList<>();
-        for (Row row : table.rows()) {
-            if (whereVal.equals(row.get(whereCol)))
-                selected.add(row);
+        List<Row> matching = new ArrayList<>();
+        if (whereCol == null) {
+            matching.addAll(table.rows());
+        } else {
+            if (table.getCol(whereCol) == null)
+                throw new IllegalArgumentException("Unknown column: " + whereCol);
+
+            for (Row row : table.rows()) {
+                if (whereVal.equals(row.get(whereCol)))
+                    matching.add(row);
+            }
         }
 
-        return selected;
+        List<Row> res = new ArrayList<>();
+        for (Row match : matching) {
+            if (cols.size() == 1 && cols.get(0).equals("*")) {
+                res.add(match);
+            } else {
+                Row projected = new Row();
+                for (String col : cols) {
+                    if (table.getCol(col) == null)
+                        throw new IllegalArgumentException("Unknown column: " + col);
+
+                    projected.put(col, match.get(col));
+                }
+
+                res.add(projected);
+            }
+        }
+
+        return res;
     }
 
     public void update(String tblName, String setCol, String setVal, String whereCol, String whereVal) {

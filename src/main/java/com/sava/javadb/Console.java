@@ -74,7 +74,7 @@ public class Console {
         System.out.println("DELETE <key> - Delete a key");
         System.out.println("CREATE TABLE <name> (<column>, ...) - Create a table");
         System.out.println("INSERT INTO <table> (<columns>) VALUES (<values>) - Insert a row");
-        System.out.println("SELECT * FROM <table> [WHERE <column> = <value>] - Retrieve rows");
+        System.out.println("SELECT <columns> FROM <table> [WHERE <column> = <value>] - Retrieve rows");
         System.out.println("SAVE - Save database to disk");
         System.out.println("LOAD - Load database from disk");
         System.out.println("CHECKPOINT - Save snapshot and clear WAL");
@@ -112,7 +112,7 @@ public class Console {
     }
 
     private void handleSelect(SelectCmd select) {
-        List<Row> rows = db.select(select.getTableName(), select.getWhereCol(), select.getWhereVal());
+        List<Row> rows = db.select(select.getCols(), select.getTableName(), select.getWhereCol(), select.getWhereVal());
         for (Row row : rows) {
             System.out.println(row);
         }

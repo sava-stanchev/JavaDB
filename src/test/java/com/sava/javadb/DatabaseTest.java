@@ -134,23 +134,8 @@ public class DatabaseTest {
     @Test
     void throwWhenSelectMissingTable() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> db.select("users", null, null));
+                () -> db.select(List.of("*"),"users", null, null));
         assertEquals("Table does not exist.", e.getMessage());
-    }
-
-    @Test
-    void selectReturnsRows() {
-        List<Column> cols = new ArrayList<>();
-        cols.add(new Column("name", "TEXT", true, false));
-        cols.add(new Column("city", "TEXT", true, false));
-        db.createTable("users", cols);
-        Row row = new Row();
-        row.put("name", "Sava");
-        db.insert("users", row);
-        List<Row> rows = db.select("users", null, null);
-
-        assertEquals(1, rows.size());
-        assertEquals("Sava", rows.get(0).get("name"));
     }
 
     @Test
@@ -239,15 +224,45 @@ public class DatabaseTest {
         row.put("id", "1");
         db.insert("users", row);
 
-        List<Row> rows1 = db.select("users", "id", "1");
+        List<Row> rows1 = db.select(List.of("*"), "users", "id", "1");
         assertEquals(1, rows1.size());
         assertEquals("1", rows1.get(0).get("id"));
 
-        List<Row> rows2 = db.select("users", "id", "99");
+        List<Row> rows2 = db.select(List.of("*"), "users", "id", "99");
         assertTrue(rows2.isEmpty());
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> db.select("users","age", "25"));
+                () -> db.select(List.of("*"), "users","age", "25"));
+        assertEquals("Unknown column: age", e.getMessage());
+    }
+
+    @Test
+    void select() {
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("id", "INT", false, false));
+        cols.add(new Column("name", "TEXT", true, false));
+        db.createTable("users", cols);
+        Row row = new Row();
+        row.put("id", "1");
+        row.put("name", "Sava");
+        db.insert("users", row);
+
+        List<Row> rows1 = db.select(List.of("name"), "users", null, null);
+        assertEquals(1, rows1.size());
+        assertEquals("Sava", rows1.get(0).get("name"));
+        assertNull(rows1.get(0).get("id"));
+
+        List<Row> rows2 = db.select(List.of("id", "name"), "users", null, null);
+        assertEquals("1", rows2.get(0).get("id"));
+        assertEquals("Sava", rows2.get(0).get("name"));
+
+        List<Row> rows3 = db.select(List.of("name"), "users", "id", "1");
+        assertEquals(1, rows3.size());
+        assertEquals("Sava", rows3.get(0).get("name"));
+        assertNull(rows3.get(0).get("id"));
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> db.select(List.of("age"), "users", null, null));
         assertEquals("Unknown column: age", e.getMessage());
     }
 
@@ -266,7 +281,7 @@ public class DatabaseTest {
 
         db.update("users", "name", "Sava", "id", "1");
 
-        List<Row> rows = db.select("users", "id", "1");
+        List<Row> rows = db.select(List.of("*"), "users", "id", "1");
         assertEquals(1, rows.size());
         assertEquals("Sava", rows.get(0).get("name"));
 
@@ -295,7 +310,7 @@ public class DatabaseTest {
 
         db.deleteRow("users", "id", "1");
 
-        List<Row> rows = db.select("users", null, null);
+        List<Row> rows = db.select(List.of("*"), "users", null, null);
         assertEquals(1, rows.size());
         assertEquals("2", rows.get(0).get("id"));
 
@@ -305,7 +320,7 @@ public class DatabaseTest {
         assertEquals("Unknown column: age", e1.getMessage());
 
         db.deleteRow("users", "id", "19612");
-        rows = db.select("users", null, null);
+        rows = db.select(List.of("*"), "users", null, null);
         assertEquals(1, rows.size());
     }
 }
