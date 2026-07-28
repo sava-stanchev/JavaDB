@@ -3,6 +3,8 @@ package com.sava.javadb;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ParserTest {
@@ -110,16 +112,54 @@ public class ParserTest {
     }
 
     @Test
+    void selectAll() {
+        Command cmd = parser.parse("SELECT * FROM users");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertEquals("users", select.getTableName());
+        assertEquals(List.of("*"), select.getCols());
+        assertNull(select.getWhereCol());
+    }
+
+    @Test
+    void selectCol() {
+        Command cmd = parser.parse("SELECT id FROM users");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertEquals("users", select.getTableName());
+        assertEquals(List.of("id"), select.getCols());
+        assertNull(select.getWhereCol());
+    }
+
+    @Test
+    void selectCols() {
+        Command cmd = parser.parse("SELECT id, name FROM users");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertEquals("users", select.getTableName());
+        assertEquals(2, select.getCols().size());
+        assertEquals("id", select.getCols().get(0));
+        assertEquals("name", select.getCols().get(1));
+    }
+
+    @Test
+    void selectColsWhere() {
+        Command cmd = parser.parse("SELECT id, name FROM users WHERE id = 1");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertEquals("users", select.getTableName());
+        assertEquals(List.of("id", "name"), select.getCols());
+        assertEquals("id", select.getWhereCol());
+        assertEquals("1", select.getWhereVal());
+    }
+
+    @Test
     void invalidSelect() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("SELECT users"));
-        assertEquals("Usage: SELECT * FROM <table> [WHERE <column> = <value>]", e.getMessage());
+        assertEquals("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]", e.getMessage());
     }
 
     @Test
     void invalidSelectWhere() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                 () -> parser.parse("SELECT * FROM users WHERE id"));
-        assertEquals("Usage: SELECT * FROM <table> [WHERE <column> = <value>]", e.getMessage());
+        assertEquals("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]", e.getMessage());
     }
 
     @Test

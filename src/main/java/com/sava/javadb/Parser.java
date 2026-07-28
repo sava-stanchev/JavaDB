@@ -56,14 +56,7 @@ public class Parser {
             case "INSERT":
                 return parseInsert(input);
             case "SELECT":
-                if (parts.length == 4 && parts[1].equals("*") && parts[2].equalsIgnoreCase("FROM"))
-                    return new SelectCmd(parts[3]);
-                if (parts.length == 8 && parts[1].equals("*") &&
-                        parts[2].equalsIgnoreCase("FROM") &&
-                        parts[4].equalsIgnoreCase("WHERE") && parts[6].equals("="))
-                    return new SelectCmd(parts[3], parts[5], parts[7]);
-
-                throw new IllegalArgumentException("Usage: SELECT * FROM <table> [WHERE <column> = <value>]");
+                return parseSelect(input);
             case "UPDATE":
                 return parseUpdate(input);
             default:
@@ -167,5 +160,43 @@ public class Parser {
             whereVal = whereVal.substring(1, whereVal.length() - 1);
 
         return new DeleteRowCmd(tblName, whereCol, whereVal);
+    }
+
+    private SelectCmd parseSelect(String input) {
+        String prefix = "SELECT ";
+        if (!input.toUpperCase().startsWith(prefix))
+            throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]");
+
+        String rest = input.substring(prefix.length()).trim();
+        int fromIdx = rest.toUpperCase().indexOf("FROM");
+        if (fromIdx == -1)
+            throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]");
+
+        String colText = rest.substring(0, fromIdx).trim();
+        String[] pieces = colText.split(",");
+        List<String> cols = new ArrayList<>();
+
+        for (String piece : pieces) {
+            cols.add(piece.trim());
+        }
+
+        String afterFrom = rest.substring(fromIdx + "FROM".length()).trim();
+        int whereIdx = afterFrom.toUpperCase().indexOf("WHERE");
+        if (whereIdx == -1)
+            return new SelectCmd(cols, afterFrom);
+
+        String tblName = afterFrom.substring(0, whereIdx).trim();
+        String whereText = afterFrom.substring(whereIdx + "WHERE".length()).trim();
+        String[] wherePair = whereText.split("=");
+        if (wherePair.length != 2)
+            throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]");
+
+        String whereCol = wherePair[0].trim();
+        String whereVal = wherePair[1].trim();
+
+        if (whereVal.startsWith("'") && whereVal.endsWith("'"))
+            whereVal = whereVal.substring(1, whereVal.length() - 1);
+
+        return new SelectCmd(cols, tblName, whereCol, whereVal);
     }
 }
