@@ -120,7 +120,10 @@ public class Parser {
         String setText = rest.substring(setIdx + "SET".length(), whereIdx).trim();
         String whereText = rest.substring(whereIdx + "WHERE".length()).trim();
         String[] setPair = setText.split("=");
-        String[] wherePair = whereText.split("=");
+        String op = parseOp(whereText);
+        if (op == null)
+            throw new IllegalArgumentException("Usage: UPDATE <table> SET <column> = <value> WHERE <column> = <value>");
+        String[] wherePair = whereText.split(op);
         if (setPair.length != 2 || wherePair.length != 2)
             throw new IllegalArgumentException("Usage: UPDATE <table> SET <column> = <value> WHERE <column> = <value>");
 
@@ -134,7 +137,7 @@ public class Parser {
         if (whereVal.startsWith("'") && whereVal.endsWith("'"))
             whereVal = whereVal.substring(1, whereVal.length() - 1);
 
-        return new UpdateCmd(tblName, setCol, setVal, whereCol, whereVal);
+        return new UpdateCmd(tblName, setCol, setVal, whereCol, op, whereVal);
     }
 
     private DeleteRowCmd parseDelete(String input) {
@@ -149,7 +152,10 @@ public class Parser {
 
         String tblName = rest.substring(0, whereIdx).trim();
         String whereText = rest.substring(whereIdx + "WHERE".length()).trim();
-        String[] wherePair = whereText.split("=");
+        String op = parseOp(whereText);
+        if (op == null)
+            throw new IllegalArgumentException("Usage: DELETE FROM <table> WHERE <column> = <value>");
+        String[] wherePair = whereText.split(op);
         if (wherePair.length != 2)
             throw new IllegalArgumentException("Usage: DELETE FROM <table> WHERE <column> = <value>");
 
@@ -159,7 +165,7 @@ public class Parser {
         if (whereVal.startsWith("'") && whereVal.endsWith("'"))
             whereVal = whereVal.substring(1, whereVal.length() - 1);
 
-        return new DeleteRowCmd(tblName, whereCol, whereVal);
+        return new DeleteRowCmd(tblName, whereCol, op, whereVal);
     }
 
     private SelectCmd parseSelect(String input) {
@@ -187,7 +193,10 @@ public class Parser {
 
         String tblName = afterFrom.substring(0, whereIdx).trim();
         String whereText = afterFrom.substring(whereIdx + "WHERE".length()).trim();
-        String[] wherePair = whereText.split("=");
+        String op = parseOp(whereText);
+        if (op == null)
+            throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]");
+        String[] wherePair = whereText.split(op);
         if (wherePair.length != 2)
             throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]");
 
@@ -197,6 +206,21 @@ public class Parser {
         if (whereVal.startsWith("'") && whereVal.endsWith("'"))
             whereVal = whereVal.substring(1, whereVal.length() - 1);
 
-        return new SelectCmd(cols, tblName, whereCol, whereVal);
+        return new SelectCmd(cols, tblName, whereCol, op, whereVal);
+    }
+
+    private String parseOp(String text) {
+        if (text.contains(">="))
+            return ">=";
+        if (text.contains("<="))
+            return "<=";
+        if (text.contains("="))
+            return "=";
+        if (text.contains(">"))
+            return ">";
+        if (text.contains("<"))
+            return "<";
+
+        return null;
     }
 }

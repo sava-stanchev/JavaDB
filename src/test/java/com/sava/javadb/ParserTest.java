@@ -150,6 +150,42 @@ public class ParserTest {
     }
 
     @Test
+    void selectGt() {
+        Command cmd = parser.parse("SELECT * FROM users WHERE age > 18");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertEquals("age", select.getWhereCol());
+        assertEquals(">", select.getWhereOp());
+        assertEquals("18", select.getWhereVal());
+    }
+
+    @Test
+    void selectGe() {
+        Command cmd = parser.parse("SELECT * FROM users WHERE age >= 18");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertEquals("age", select.getWhereCol());
+        assertEquals(">=", select.getWhereOp());
+        assertEquals("18", select.getWhereVal());
+    }
+
+    @Test
+    void selectLt() {
+        Command cmd = parser.parse("SELECT * FROM users WHERE age < 65");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertEquals("age", select.getWhereCol());
+        assertEquals("<", select.getWhereOp());
+        assertEquals("65", select.getWhereVal());
+    }
+
+    @Test
+    void selectLe() {
+        Command cmd = parser.parse("SELECT * FROM users WHERE age <= 65");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertEquals("age", select.getWhereCol());
+        assertEquals("<=", select.getWhereOp());
+        assertEquals("65", select.getWhereVal());
+    }
+
+    @Test
     void invalidSelect() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("SELECT users"));
         assertEquals("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]", e.getMessage());

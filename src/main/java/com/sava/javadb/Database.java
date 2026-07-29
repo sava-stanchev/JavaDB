@@ -137,7 +137,11 @@ public class Database {
         table.addRow(row);
     }
 
-    public List<Row> select(List<String> cols, String tblName, String whereCol, String whereVal) {
+    public List<Row> select(List<String> cols, String tblName) {
+        return select(cols, tblName, null, null, null);
+    }
+
+    public List<Row> select(List<String> cols, String tblName, String whereCol, String op, String whereVal) {
         Table table = getTable(tblName);
         if (table == null)
             throw new IllegalArgumentException("Table does not exist.");
@@ -150,7 +154,7 @@ public class Database {
                 throw new IllegalArgumentException("Unknown column: " + whereCol);
 
             for (Row row : table.rows()) {
-                if (whereVal.equals(row.get(whereCol)))
+                if (matches(table.getCol(whereCol), row.get(whereCol), op, whereVal))
                     matching.add(row);
             }
         }
@@ -175,7 +179,7 @@ public class Database {
         return res;
     }
 
-    public void update(String tblName, String setCol, String setVal, String whereCol, String whereVal) {
+    public void update(String tblName, String setCol, String setVal, String whereCol, String op, String whereVal) {
         Table table = getTable(tblName);
         if (table == null)
             throw new IllegalArgumentException("Table does not exist.");
@@ -189,12 +193,12 @@ public class Database {
             throw new IllegalArgumentException("Invalid value for column: " + setCol);
 
         for (Row row : table.rows()) {
-            if (whereVal.equals(row.get(whereCol)))
+            if (matches(table.getCol(whereCol), row.get(whereCol), op, whereVal))
                 row.put(setCol, setVal);
         }
     }
 
-    public void deleteRow(String tblName, String whereCol, String whereVal) {
+    public void deleteRow(String tblName, String whereCol, String op, String whereVal) {
         Table table = getTable(tblName);
         if (table == null)
             throw new IllegalArgumentException("Table does not exist.");
@@ -204,8 +208,33 @@ public class Database {
         Iterator<Row> it = table.rows().iterator();
         while (it.hasNext()) {
             Row row = it.next();
-            if (whereVal.equals(row.get(whereCol)))
+            if (matches(table.getCol(whereCol), row.get(whereCol), op, whereVal))
                 it.remove();
+        }
+    }
+
+    private boolean matches(Column col, String rowVal, String op, String whereVal) {
+        if (col.getType().equals("TEXT")) {
+            if (!op.equals("="))
+                throw new IllegalArgumentException("Operator " + op + " is only supported for INT columns.");
+
+            return rowVal.equals(whereVal);
+        }
+
+        int l = Integer.parseInt(rowVal), r = Integer.parseInt(whereVal);
+        switch (op) {
+            case "=":
+                return l == r;
+            case ">":
+                return l > r;
+            case "<":
+                return l < r;
+            case ">=":
+                return l >= r;
+            case "<=":
+                return l <= r;
+            default:
+                throw new IllegalArgumentException("Unknown operator: " + op);
         }
     }
 }

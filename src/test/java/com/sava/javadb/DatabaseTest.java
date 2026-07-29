@@ -134,7 +134,7 @@ public class DatabaseTest {
     @Test
     void throwWhenSelectMissingTable() {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> db.select(List.of("*"),"users", null, null));
+                () -> db.select(List.of("*"),"users"));
         assertEquals("Table does not exist.", e.getMessage());
     }
 
@@ -224,15 +224,15 @@ public class DatabaseTest {
         row.put("id", "1");
         db.insert("users", row);
 
-        List<Row> rows1 = db.select(List.of("*"), "users", "id", "1");
+        List<Row> rows1 = db.select(List.of("*"), "users", "id", "=", "1");
         assertEquals(1, rows1.size());
         assertEquals("1", rows1.get(0).get("id"));
 
-        List<Row> rows2 = db.select(List.of("*"), "users", "id", "99");
+        List<Row> rows2 = db.select(List.of("*"), "users", "id", "=", "99");
         assertTrue(rows2.isEmpty());
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> db.select(List.of("*"), "users","age", "25"));
+                () -> db.select(List.of("*"), "users","age", "=", "25"));
         assertEquals("Unknown column: age", e.getMessage());
     }
 
@@ -247,23 +247,66 @@ public class DatabaseTest {
         row.put("name", "Sava");
         db.insert("users", row);
 
-        List<Row> rows1 = db.select(List.of("name"), "users", null, null);
+        List<Row> rows1 = db.select(List.of("name"), "users");
         assertEquals(1, rows1.size());
         assertEquals("Sava", rows1.get(0).get("name"));
         assertNull(rows1.get(0).get("id"));
 
-        List<Row> rows2 = db.select(List.of("id", "name"), "users", null, null);
+        List<Row> rows2 = db.select(List.of("id", "name"), "users");
         assertEquals("1", rows2.get(0).get("id"));
         assertEquals("Sava", rows2.get(0).get("name"));
 
-        List<Row> rows3 = db.select(List.of("name"), "users", "id", "1");
+        List<Row> rows3 = db.select(List.of("name"), "users", "id", "=", "1");
         assertEquals(1, rows3.size());
         assertEquals("Sava", rows3.get(0).get("name"));
         assertNull(rows3.get(0).get("id"));
 
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
-                () -> db.select(List.of("age"), "users", null, null));
+                () -> db.select(List.of("age"), "users"));
         assertEquals("Unknown column: age", e.getMessage());
+    }
+
+    @Test
+    void selectOp() {
+        List<Column> cols = new ArrayList<>();
+        cols.add(new Column("id", "INT", false, false));
+        cols.add(new Column("age", "INT", false, false));
+        cols.add(new Column("name", "TEXT", true, false));
+        db.createTable("users", cols);
+        Row row1 = new Row();
+        row1.put("id", "1");
+        row1.put("age", "18");
+        db.insert("users", row1);
+        Row row2 = new Row();
+        row2.put("id", "2");
+        row2.put("age", "25");
+        db.insert("users", row2);
+        Row row3 = new Row();
+        row3.put("id", "3");
+        row3.put("age", "40");
+        db.insert("users", row3);
+
+        List<Row> rows1 = db.select(List.of("*"), "users", "age", ">", "20");
+        assertEquals(2, rows1.size());
+        assertEquals("2", rows1.get(0).get("id"));
+        assertEquals("3", rows1.get(1).get("id"));
+
+        List<Row> rows2 = db.select(List.of("*"), "users", "age", "<", "25");
+        assertEquals(1, rows2.size());
+        assertEquals("1", rows2.get(0).get("id"));
+
+        List<Row> rows3 = db.select(List.of("*"), "users", "age", ">=", "25");
+        assertEquals(2, rows3.size());
+        assertEquals("2", rows3.get(0).get("id"));
+        assertEquals("3", rows3.get(1).get("id"));
+
+        List<Row> rows4 = db.select(List.of("*"), "users", "age", "<=", "18");
+        assertEquals(1, rows4.size());
+        assertEquals("1", rows4.get(0).get("id"));
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> db.select(List.of("*"), "users", "name", ">", "huh"));
+        assertEquals("Operator > is only supported for INT columns.", e.getMessage());
     }
 
     @Test
@@ -279,19 +322,19 @@ public class DatabaseTest {
         row.put("age", "32");
         db.insert("users", row);
 
-        db.update("users", "name", "Sava", "id", "1");
+        db.update("users", "name", "Sava", "id", "=", "1");
 
-        List<Row> rows = db.select(List.of("*"), "users", "id", "1");
+        List<Row> rows = db.select(List.of("*"), "users", "id", "=", "1");
         assertEquals(1, rows.size());
         assertEquals("Sava", rows.get(0).get("name"));
 
 
         IllegalArgumentException e1 = assertThrows(IllegalArgumentException.class,
-                () -> db.update("users", "city", "Manila", "id", "1"));
+                () -> db.update("users", "city", "Manila", "id", "=", "1"));
         assertEquals("Unknown column: city", e1.getMessage());
 
         IllegalArgumentException e2 = assertThrows(IllegalArgumentException.class,
-                () -> db.update("users", "age", "whatever", "age", "32"));
+                () -> db.update("users", "age", "huh", "age", "=", "32"));
         assertEquals("Invalid value for column: age", e2.getMessage());
     }
 
@@ -308,19 +351,19 @@ public class DatabaseTest {
         row2.put("id", "2");
         db.insert("users", row2);
 
-        db.deleteRow("users", "id", "1");
+        db.deleteRow("users", "id", "=", "1");
 
-        List<Row> rows = db.select(List.of("*"), "users", null, null);
+        List<Row> rows = db.select(List.of("*"), "users");
         assertEquals(1, rows.size());
         assertEquals("2", rows.get(0).get("id"));
 
 
         IllegalArgumentException e1 = assertThrows(IllegalArgumentException.class,
-                () -> db.deleteRow("users", "age", "32"));
+                () -> db.deleteRow("users", "age", "=", "32"));
         assertEquals("Unknown column: age", e1.getMessage());
 
-        db.deleteRow("users", "id", "19612");
-        rows = db.select(List.of("*"), "users", null, null);
+        db.deleteRow("users", "id", "=", "19612");
+        rows = db.select(List.of("*"), "users");
         assertEquals(1, rows.size());
     }
 }

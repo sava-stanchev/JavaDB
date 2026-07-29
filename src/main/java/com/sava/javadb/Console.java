@@ -59,6 +59,8 @@ public class Console {
                             handleInsert(insert);
                         } else if (command instanceof SelectCmd select) {
                             handleSelect(select);
+                        } else if (command instanceof UpdateCmd update) {
+                            handleUpdate(update);
                         }
                     } catch (IllegalArgumentException e) {
                         System.out.println(e.getMessage());
@@ -97,7 +99,7 @@ public class Console {
     }
 
     private void handleDelete(DeleteRowCmd delete) {
-        db.deleteRow(delete.getTableName(), delete.getWhereCol(), delete.getWhereVal());
+        db.deleteRow(delete.getTableName(), delete.getWhereCol(), delete.getWhereOp(), delete.getWhereVal());
         System.out.println("OK");
     }
 
@@ -112,10 +114,17 @@ public class Console {
     }
 
     private void handleSelect(SelectCmd select) {
-        List<Row> rows = db.select(select.getCols(), select.getTableName(), select.getWhereCol(), select.getWhereVal());
+        List<Row> rows = db.select(select.getCols(), select.getTableName(),
+                select.getWhereCol(), select.getWhereOp(), select.getWhereVal());
         for (Row row : rows) {
             System.out.println(row);
         }
+    }
+
+    private void handleUpdate(UpdateCmd update) {
+        db.update(update.getTableName(), update.getSetCol(), update.getSetVal(),
+                update.getWhereCol(), update.getWhereOp(), update.getWhereVal());
+        System.out.println("OK");
     }
 
     private void saveDb() {
