@@ -12,20 +12,45 @@ I want to understand how databases work internally by implementing the core piec
 
 ## Roadmap
 
-* [x] Project setup
-* [x] In-memory key-value store
-* [x] Persistent storage
-* [x] Write-ahead logging (WAL)
-* [x] Checkpointing
-* [x] Indexes
-* [x] Command parser
-* [ ] Tables and schemas
-* [ ] SQL support
-* [ ] Transactions
-* [ ] Concurrency
-* [ ] Client/server architecture
-* [ ] Replication
-* [ ] Sharding
+- [x] Project setup
+- [x] In-memory key-value store
+- [x] Persistent storage
+- [x] Write-ahead logging (WAL)
+- [x] Checkpointing
+- [x] Hash indexes
+- [x] Command parser
+- [x] Tables and schemas
+
+### SQL support
+- [x] CREATE TABLE
+- [x] INSERT
+- [x] SELECT
+- [x] WHERE
+- [x] UPDATE
+- [x] DELETE
+- [x] Column projection
+- [x] Comparison operators
+- [ ] ORDER BY
+- [ ] LIMIT
+- [ ] Aggregate functions
+- [ ] GROUP BY
+- [ ] HAVING
+- [ ] JOINs
+- [ ] Subqueries
+
+### Indexes
+- [ ] B+ tree indexes
+
+### Query engine
+- [ ] Query planner
+- [ ] Cost-based optimization
+
+### Database engine
+- [ ] Transactions
+- [ ] Concurrency
+- [ ] Client/server architecture
+- [ ] Replication
+- [ ] Sharding
 
 ## Technologies
 
