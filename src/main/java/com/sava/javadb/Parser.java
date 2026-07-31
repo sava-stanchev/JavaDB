@@ -171,12 +171,12 @@ public class Parser {
     private SelectCmd parseSelect(String input) {
         String prefix = "SELECT ";
         if (!input.toUpperCase().startsWith(prefix))
-            throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]");
+            throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> <op> <value>] [LIMIT <count>]");
 
         String rest = input.substring(prefix.length()).trim();
         int fromIdx = rest.toUpperCase().indexOf("FROM");
         if (fromIdx == -1)
-            throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]");
+            throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> <op> <value>] [LIMIT <count>]");
 
         String colText = rest.substring(0, fromIdx).trim();
         String[] pieces = colText.split(",");
@@ -187,18 +187,32 @@ public class Parser {
         }
 
         String afterFrom = rest.substring(fromIdx + "FROM".length()).trim();
-        int whereIdx = afterFrom.toUpperCase().indexOf("WHERE");
-        if (whereIdx == -1)
-            return new SelectCmd(cols, afterFrom);
 
-        String tblName = afterFrom.substring(0, whereIdx).trim();
-        String whereText = afterFrom.substring(whereIdx + "WHERE".length()).trim();
+        int limIdx = afterFrom.toUpperCase().indexOf("LIMIT");
+        String tblText = afterFrom;
+        Integer lim = null;
+        if (limIdx != -1) {
+            tblText = afterFrom.substring(0, limIdx).trim();
+            String afterLim = afterFrom.substring(limIdx + "LIMIT".length()).trim();
+            try {
+                lim = Integer.parseInt(afterLim);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> <op> <value>] [LIMIT <count>]");
+            }
+        }
+
+        int whereIdx = tblText.toUpperCase().indexOf("WHERE");
+        if (whereIdx == -1)
+            return new SelectCmd(cols, tblText, null, null, null, lim);
+
+        String tblName = tblText.substring(0, whereIdx).trim();
+        String whereText = tblText.substring(whereIdx + "WHERE".length()).trim();
         String op = parseOp(whereText);
         if (op == null)
-            throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]");
+            throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> <op> <value>] [LIMIT <count>]");
         String[] wherePair = whereText.split(op);
         if (wherePair.length != 2)
-            throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]");
+            throw new IllegalArgumentException("Usage: SELECT <columns> FROM <table> [WHERE <column> <op> <value>] [LIMIT <count>]");
 
         String whereCol = wherePair[0].trim();
         String whereVal = wherePair[1].trim();
@@ -206,7 +220,7 @@ public class Parser {
         if (whereVal.startsWith("'") && whereVal.endsWith("'"))
             whereVal = whereVal.substring(1, whereVal.length() - 1);
 
-        return new SelectCmd(cols, tblName, whereCol, op, whereVal);
+        return new SelectCmd(cols, tblName, whereCol, op, whereVal, lim);
     }
 
     private String parseOp(String text) {

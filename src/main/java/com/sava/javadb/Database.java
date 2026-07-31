@@ -138,10 +138,10 @@ public class Database {
     }
 
     public List<Row> select(List<String> cols, String tblName) {
-        return select(cols, tblName, null, null, null);
+        return select(cols, tblName, null, null, null, null);
     }
 
-    public List<Row> select(List<String> cols, String tblName, String whereCol, String op, String whereVal) {
+    public List<Row> select(List<String> cols, String tblName, String whereCol, String op, String whereVal, Integer lim) {
         Table table = getTable(tblName);
         if (table == null)
             throw new IllegalArgumentException("Table does not exist.");
@@ -174,6 +174,9 @@ public class Database {
 
                 res.add(projected);
             }
+
+            if (lim != null && res.size() == lim)
+                break;
         }
 
         return res;

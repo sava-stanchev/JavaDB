@@ -8,17 +8,16 @@ public class SelectCmd extends Command {
     private final String whereOp;
     private final String whereVal;
     private final List<String> cols;
+    private final Integer lim;
 
-    public SelectCmd(List<String> cols, String tableName) {
-        this(cols, tableName, null, null, null);
-    }
-
-    public SelectCmd(List<String> cols, String tableName, String whereCol, String whereOp, String whereVal) {
+    public SelectCmd(List<String> cols, String tableName,
+                     String whereCol, String whereOp, String whereVal, Integer lim) {
         this.cols = cols;
         this.tableName = tableName;
         this.whereCol = whereCol;
         this.whereVal = whereVal;
         this.whereOp = whereOp;
+        this.lim = lim;
     }
 
     public String getTableName() {
@@ -39,5 +38,9 @@ public class SelectCmd extends Command {
 
     public List<String> getCols() {
         return cols;
+    }
+
+    public Integer getLimit() {
+        return lim;
     }
 }

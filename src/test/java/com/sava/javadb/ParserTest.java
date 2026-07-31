@@ -186,16 +186,38 @@ public class ParserTest {
     }
 
     @Test
-    void invalidSelect() {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> parser.parse("SELECT users"));
-        assertEquals("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]", e.getMessage());
+    void selectLim() {
+        Command cmd = parser.parse("SELECT * FROM users LIMIT 5");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertEquals(Integer.valueOf(5), select.getLimit());
     }
 
     @Test
-    void invalidSelectWhere() {
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+    void selectWhereLim() {
+        Command cmd = parser.parse("SELECT * FROM users WHERE age > 18 LIMIT 2");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertEquals(Integer.valueOf(2), select.getLimit());
+    }
+
+    @Test
+    void selectNoLim() {
+        Command cmd = parser.parse("SELECT * FROM users");
+        SelectCmd select = assertInstanceOf(SelectCmd.class, cmd);
+        assertNull(select.getLimit());
+    }
+
+    @Test
+    void invalidSelect() {
+        IllegalArgumentException e1 = assertThrows(IllegalArgumentException.class, () -> parser.parse("SELECT users"));
+        assertEquals("Usage: SELECT <columns> FROM <table> [WHERE <column> <op> <value>] [LIMIT <count>]", e1.getMessage());
+
+        IllegalArgumentException e2 = assertThrows(IllegalArgumentException.class,
+                () -> parser.parse("SELECT * FROM users LIMIT"));
+        assertEquals("Usage: SELECT <columns> FROM <table> [WHERE <column> <op> <value>] [LIMIT <count>]", e2.getMessage());
+
+        IllegalArgumentException e3 = assertThrows(IllegalArgumentException.class,
                 () -> parser.parse("SELECT * FROM users WHERE id"));
-        assertEquals("Usage: SELECT <columns> FROM <table> [WHERE <column> = <value>]", e.getMessage());
+        assertEquals("Usage: SELECT <columns> FROM <table> [WHERE <column> <op> <value>] [LIMIT <count>]", e3.getMessage());
     }
 
     @Test
